@@ -52,14 +52,17 @@ public class Backstabber : MonoBehaviour
 
         Vector2 toPlayer = player.position - transform.position;
 
-        // Distance gate (THIS is what triggerDistance is for)
+        // Distance gate
         if (toPlayer.magnitude > triggerDistance)
         {
             hasDot = false;
             return;
         }
 
-        // Side check (left or right)
+        // Ignore tiny jitter around center
+        if (Mathf.Abs(toPlayer.x) < 0.2f)
+            return;
+
         float currentSide = Mathf.Sign(toPlayer.x);
 
         if (!hasDot)
@@ -69,7 +72,7 @@ public class Backstabber : MonoBehaviour
             return;
         }
 
-        // Crossing detection
+        // Only trigger on REAL side crossing
         if (lastDot != currentSide)
         {
             triggered = true;
@@ -83,17 +86,14 @@ public class Backstabber : MonoBehaviour
 
 
 
-    IEnumerator Betray()
+        IEnumerator Betray()
     {
         yield return new WaitForSecondsRealtime(windupTime);
 
         state.SetHostile(true);
 
-        if (player && Vector2.Distance(transform.position, player.position) <= triggerDistance + 0.2f)
-        {
-            player.GetComponent<Health>()?.TakeDamage(damage);
-            player.GetComponent<KnockbackReceiver>()?
-                .ApplyKnockback(player.position - transform.position, knockbackForce);
-        }
+        yield return new WaitForSecondsRealtime(0.05f); // grace window
+
     }
+
 }

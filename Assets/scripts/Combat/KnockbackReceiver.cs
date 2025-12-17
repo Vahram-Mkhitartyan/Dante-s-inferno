@@ -3,38 +3,29 @@ using System.Collections;
 
 public class KnockbackReceiver : MonoBehaviour
 {
-    public float knockbackDuration = 0.12f;
-    public float hitStopTime = 0.15f; // TEMP: big so you can see it
+    public bool IsKnockedBack { get; private set; }
 
-    private bool isKnockedBack = false;
-    public bool IsKnockedBack => isKnockedBack;
+    private Rigidbody2D rb;
 
-    public void ApplyKnockback(Vector2 direction, float force)
+    void Awake()
     {
-        if (!gameObject.activeInHierarchy) return;
-
-        StopAllCoroutines();
-        StartCoroutine(KnockbackRoutine(direction.normalized, force));
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    IEnumerator KnockbackRoutine(Vector2 direction, float force)
+    public void ApplyKnockback(Vector2 dir, float force)
     {
-        isKnockedBack = true;
+        StopAllCoroutines();
+        StartCoroutine(KnockRoutine(dir.normalized * force));
+    }
 
-        Debug.Log($"{name} HIT STOP");
+    IEnumerator KnockRoutine(Vector2 force)
+    {
+        IsKnockedBack = true;
+        rb.linearVelocity = Vector2.zero;
+        rb.AddForce(force, ForceMode2D.Impulse);
 
-        // Realtime pause (works even if timescale changes)
-        if (hitStopTime > 0f)
-            yield return new WaitForSecondsRealtime(hitStopTime);
+        yield return new WaitForSeconds(0.15f);
 
-        float timer = 0f;
-        while (timer < knockbackDuration)
-        {
-            transform.position += (Vector3)(direction * force * Time.deltaTime);
-            timer += Time.deltaTime;
-            yield return null;
-        }
-
-        isKnockedBack = false;
+        IsKnockedBack = false;
     }
 }

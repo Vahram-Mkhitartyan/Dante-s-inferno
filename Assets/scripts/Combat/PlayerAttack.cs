@@ -6,12 +6,15 @@ public class PlayerAttack : MonoBehaviour
     public float attackRange = 1f;
     public Vector2 attackOffset = new Vector2(0.8f, 0f);
     public LayerMask enemyLayer;
+    private KnockbackGiver knockbackGiver;
 
     private PlayerController player;
 
     void Awake()
     {
         player = GetComponent<PlayerController>();
+        knockbackGiver = GetComponent<KnockbackGiver>();
+
     }
 
     void Update()
@@ -39,11 +42,9 @@ public class PlayerAttack : MonoBehaviour
             if (health)
                 health.TakeDamage(damage);
 
-            KnockbackReceiver knockback = hit.GetComponent<KnockbackReceiver>();
-            if (knockback)
+            if (knockbackGiver)
             {
-                Vector2 dir = (hit.transform.position - transform.position);
-                knockback.ApplyKnockback(dir, 6f);
+                knockbackGiver.ApplyTo(hit.gameObject, 0); // comboStep = 0 for now
             }
         }
     }

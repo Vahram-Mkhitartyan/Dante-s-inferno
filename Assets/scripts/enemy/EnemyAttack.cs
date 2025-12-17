@@ -6,12 +6,14 @@ public class EnemyAttack : MonoBehaviour
     public float attackRange = 0.8f;
     public float attackCooldown = 1.2f;
 
+    private KnockbackGiver knockbackGiver;
     private Transform player;
     private float lastAttackTime;
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        knockbackGiver = GetComponent<KnockbackGiver>();
     }
 
     void Update()
@@ -34,11 +36,9 @@ public class EnemyAttack : MonoBehaviour
         if (health)
             health.TakeDamage(damage);
 
-        KnockbackReceiver knockback = player.GetComponent<KnockbackReceiver>();
-        if (knockback)
+        if (knockbackGiver)
         {
-            Vector2 dir = (player.position - transform.position);
-            knockback.ApplyKnockback(dir, 5f);
+            knockbackGiver.ApplyTo(player.gameObject);
         }
     }
 
