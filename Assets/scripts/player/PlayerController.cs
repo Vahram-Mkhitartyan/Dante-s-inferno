@@ -4,46 +4,40 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 6f;
-
-    [Header("Grounding")]
-    public float skinWidth = 0.02f;
-
-    [Header("Jump")]
     public float jumpForce = 12f;
     public float gravity = 35f;
+    public float skinWidth = 0.02f;
     public LayerMask groundLayer;
 
-    private KnockbackReceiver knockback;
-    private SpriteRenderer spriteRenderer;
-    private Collider2D col;
-
     public int FacingDirection { get; private set; } = 1;
+    public bool IsGrounded => isGrounded;
 
     private Vector2 velocity;
     private bool isGrounded;
 
+    private SpriteRenderer sprite;
+    private Collider2D col;
+    private KnockbackReceiver knockback;
+
     void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        knockback = GetComponent<KnockbackReceiver>();
+        sprite = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
+        knockback = GetComponent<KnockbackReceiver>();
     }
 
     void Update()
     {
-        float x = 0f;
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) x = -1f;
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) x = 1f;
+        float x = Input.GetAxisRaw("Horizontal");
+        velocity.x = x * moveSpeed;
 
         if (x != 0)
         {
             FacingDirection = (int)Mathf.Sign(x);
-            spriteRenderer.flipX = FacingDirection == -1;
+            sprite.flipX = FacingDirection == -1;
         }
 
-        velocity.x = x * moveSpeed;
-
-        if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.W) && isGrounded)
         {
             velocity.y = jumpForce;
             isGrounded = false;
@@ -56,11 +50,8 @@ public class PlayerController : MonoBehaviour
             return;
 
         float dt = Time.deltaTime;
-
-        // ----- HORIZONTAL MOVE -----
         transform.position += Vector3.right * velocity.x * dt;
 
-        // ----- GROUND CHECK -----
         RaycastHit2D hit = Physics2D.BoxCast(
             col.bounds.center,
             col.bounds.size,
@@ -70,22 +61,19 @@ public class PlayerController : MonoBehaviour
             groundLayer
         );
 
-        if (hit.collider != null && velocity.y <= 0f)
+        if (hit && velocity.y <= 0)
         {
-            // Grounded: hard lock
             isGrounded = true;
-            velocity.y = 0f;
+            velocity.y = 0;
 
-            float groundY = hit.point.y + col.bounds.extents.y;
             transform.position = new Vector3(
                 transform.position.x,
-                groundY,
+                hit.point.y + col.bounds.extents.y,
                 transform.position.z
             );
         }
         else
         {
-            // Airborne: gravity applies
             isGrounded = false;
             velocity.y -= gravity * dt;
             transform.position += Vector3.up * velocity.y * dt;

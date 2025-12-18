@@ -4,7 +4,6 @@ using System.Collections;
 public class KnockbackReceiver : MonoBehaviour
 {
     public bool IsKnockedBack { get; private set; }
-
     private Rigidbody2D rb;
 
     void Awake()
@@ -23,9 +22,7 @@ public class KnockbackReceiver : MonoBehaviour
         IsKnockedBack = true;
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(force, ForceMode2D.Impulse);
-
         yield return new WaitForSeconds(0.15f);
-
         IsKnockedBack = false;
     }
 }
