@@ -32,9 +32,6 @@ public class Health : MonoBehaviour
             StartCoroutine(BlinkRoutine());
 
         if (currentHealth <= 0)
-            StartCoroutine(DieRoutine());
-
-        if (currentHealth <= 0)
         {
             TryAwardSin();     // ← ADD HERE
             StartCoroutine(DieRoutine());

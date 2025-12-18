@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class AttackExecutor : MonoBehaviour
 {
+    [Header("Hit Origin")]
+    public Vector2 hitOffset = new Vector2(0.8f, 0f);
     public Transform hitOrigin;
     public LayerMask enemyLayer;
 
@@ -12,7 +14,9 @@ public class AttackExecutor : MonoBehaviour
 
     [Header("Kick")]
     public int kickDamage = 1;
-    public Vector2 kickKnockback = new Vector2(4f, 8f);
+    public float kickHorizontalForce = 4f;
+    public float kickVerticalForce = 8f;
+
 
     [Header("Spin")]
     public float spinRadius = 1.5f;
@@ -46,11 +50,26 @@ public class AttackExecutor : MonoBehaviour
     void Kick()
     {
         Collider2D hit = Physics2D.OverlapCircle(
-            hitOrigin.position, 1f, enemyLayer);
+            GetHitOrigin(),
+            1f,
+            enemyLayer
+        );
 
         if (!hit) return;
-        Apply(hit, kickDamage, kickKnockback);
+
+        float dir = GetFacingDirection();
+        Vector2 force = new Vector2(dir * kickHorizontalForce, kickVerticalForce);
+
+        Apply(hit, kickDamage, force);
     }
+
+    float GetFacingDirection()
+    {
+        PlayerController pc = GetComponent<PlayerController>();
+        return pc != null ? pc.FacingDirection : 1f;
+    }
+
+
 
     void Spin()
     {
@@ -68,6 +87,12 @@ public class AttackExecutor : MonoBehaviour
 
         KnockbackReceiver kb = target.GetComponent<KnockbackReceiver>();
         if (kb) kb.ApplyKnockback(force, force.magnitude);
+    }
+
+    Vector2 GetHitOrigin()
+    {
+        float dir = GetFacingDirection();
+        return (Vector2)transform.position + new Vector2(dir * hitOffset.x, hitOffset.y);
     }
 
     Vector2 Direction(Collider2D t)

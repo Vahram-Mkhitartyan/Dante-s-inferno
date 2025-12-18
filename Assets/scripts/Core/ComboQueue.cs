@@ -3,44 +3,71 @@ using UnityEngine;
 
 public class ComboQueue : MonoBehaviour
 {
-    public int maxSize = 6;
-    public float resetTime = 0.6f;
+    public int maxSize = 8;
+    public float resetTime = 0.8f;
 
-    private Queue<char> queue = new Queue<char>();
+    private readonly List<char> inputs = new List<char>();
     private float lastInputTime;
 
     public void Register(char input)
     {
+        // time gap -> reset history
         if (Time.time - lastInputTime > resetTime)
-            queue.Clear();
+            inputs.Clear();
 
-        if (queue.Count >= maxSize)
-            queue.Dequeue();
-
-        queue.Enqueue(input);
         lastInputTime = Time.time;
+
+        inputs.Add(input);
+        if (inputs.Count > maxSize)
+            inputs.RemoveAt(0);
     }
 
-    public bool Matches(string pattern)
-    {
-        if (pattern.Length > queue.Count) return false;
+    public void Clear() => inputs.Clear();
 
-        char[] arr = queue.ToArray();
-        for (int i = 0; i < pattern.Length; i++)
+    public string DebugString() => new string(inputs.ToArray());
+
+    // AAA / BBB / CCC
+    public bool IsSameSpam(int count = 3)
+    {
+        if (inputs.Count < count) return false;
+
+        int lastIndex = inputs.Count - 1;
+        char last = inputs[lastIndex];
+
+        for (int i = 1; i < count; i++)
         {
-            if (arr[arr.Length - pattern.Length + i] != pattern[i])
+            if (inputs[lastIndex - i] != last)
                 return false;
         }
+
         return true;
     }
 
-    public string DebugString()
+
+    // ABABAB (or BCB CBC, etc.)
+    public bool IsAlternatingSpam(int pairs = 3)
     {
-        return new string(queue.ToArray());
+        int needed = pairs * 2;
+        if (inputs.Count < needed) return false;
+
+        // Take the last N inputs
+        int startIndex = inputs.Count - needed;
+
+        char first = inputs[startIndex];
+        char second = inputs[startIndex + 1];
+
+        if (first == second)
+            return false;
+
+        for (int i = 0; i < needed; i++)
+        {
+            char expected = (i % 2 == 0) ? first : second;
+            if (inputs[startIndex + i] != expected)
+                return false;
+        }
+
+        return true;
     }
 
-    public void Clear()
-    {
-        queue.Clear();
-    }
+
 }

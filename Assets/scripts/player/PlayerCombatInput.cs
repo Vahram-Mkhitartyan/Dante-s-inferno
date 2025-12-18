@@ -11,50 +11,40 @@ public class PlayerCombatInput : MonoBehaviour
         combo = GetComponent<ComboQueue>();
         executor = GetComponent<AttackExecutor>();
         player = GetComponent<PlayerController>();
+        Debug.Log("PlayerCombatInput AWAKE on ");
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.J))
-            combo.Register('A');
+            HandleInput('A');
 
         if (Input.GetKeyDown(KeyCode.K))
-            combo.Register('B');
+            HandleInput('B');
 
         if (Input.GetKeyDown(KeyCode.L) && player.IsGrounded)
-            combo.Register('C');
-
-        ResolveCombos();
+            HandleInput('C');
     }
 
-    void ResolveCombos()
+
+    void HandleInput(char input)
     {
-        // C — Spin (ground-only)
-        if (combo.Matches("C") && player.IsGrounded)
-        {
-            executor.Execute(AttackType.Spin360);
-            combo.Clear();
-            return;
-        }
+        combo.Register(input);
 
-        // B — Kick
-        if (combo.Matches("B"))
+        switch (input)
         {
-            executor.Execute(AttackType.KickLauncher);
-            combo.Clear();
-            return;
-        }
+            case 'A':
+                executor.Execute(AttackType.Sword);
+                break;
 
-        // A — Sword
-        if (combo.Matches("A"))
-        {
-            executor.Execute(AttackType.Sword);
-            combo.Clear();
-            return;
-        }
+            case 'B':
+                executor.Execute(AttackType.KickLauncher);
+                break;
 
-        // Future combos go BELOW single attacks
-        // Example:
-        // if (combo.Matches("BA")) { ... }
+            case 'C':
+                executor.Execute(AttackType.Spin360);
+                break;
+        }
     }
+
 }

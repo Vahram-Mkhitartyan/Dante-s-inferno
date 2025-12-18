@@ -6,14 +6,12 @@ public class EnemyAttack : MonoBehaviour
     public float attackRange = 0.8f;
     public float attackCooldown = 1.2f;
 
-    private KnockbackGiver knockbackGiver;
     private Transform player;
     private float lastAttackTime;
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
-        knockbackGiver = GetComponent<KnockbackGiver>();
     }
 
     void Update()
@@ -24,28 +22,37 @@ public class EnemyAttack : MonoBehaviour
 
         if (distance <= attackRange && Time.time >= lastAttackTime + attackCooldown)
         {
-            Attack();
+            PerformAttack();
         }
     }
 
-    void Attack()
+    // 🔹 NORMAL AI ATTACK
+    void PerformAttack()
     {
         lastAttackTime = Time.time;
+        DealDamage();
+    }
 
+    // 🔹 COUNTERATTACK ENTRY POINT (THIS IS WHAT WAS MISSING)
+    public void ForceAttack()
+    {
+        if (!player) return;
+
+        lastAttackTime = Time.time; // reset cooldown
+        DealDamage();
+    }
+
+    void DealDamage()
+    {
         Health health = player.GetComponent<Health>();
         if (health)
             health.TakeDamage(damage);
 
-        if (knockbackGiver)
+        KnockbackReceiver knockback = player.GetComponent<KnockbackReceiver>();
+        if (knockback)
         {
-            knockbackGiver.ApplyTo(player.gameObject);
+            Vector2 dir = (player.position - transform.position);
+            knockback.ApplyKnockback(dir, 5f);
         }
-    }
-
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }

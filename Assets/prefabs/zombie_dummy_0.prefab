@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 694380017316791858}
   - component: {fileID: -3948196172062489378}
   - component: {fileID: 6868456959570282028}
+  - component: {fileID: 6118540272344082018}
   m_Layer: 8
   m_Name: zombie_dummy_0
   m_TagString: Enemy
@@ -157,9 +158,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6728bc17d04cc46ddbcd10abe541d03d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  maxHealth: 3
-  blinkTime: 0.08
-  deathDelay: 0.08
+  maxHealth: 7
+  blinkTime: 0.1
+  deathDelay: 0.5
 --- !u!114 &5520271808884637353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -241,7 +242,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 0.0001
+  m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0
   m_GravityScale: 3
@@ -272,3 +273,17 @@ MonoBehaviour:
   comboForceBonus: 2
   verticalForce: 5
   pushAwayFromSelf: 1
+--- !u!114 &6118540272344082018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7225889487477389064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 756bf8139d8164418935d8ef37c30209, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCounterAttack
+  cooldown: 2
+  spamRepeatThreshold: 3
