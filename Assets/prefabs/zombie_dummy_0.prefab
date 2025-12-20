@@ -20,7 +20,7 @@ GameObject:
   - component: {fileID: -3948196172062489378}
   - component: {fileID: 6868456959570282028}
   - component: {fileID: 6118540272344082018}
-  m_Layer: 8
+  m_Layer: 7
   m_Name: zombie_dummy_0
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -285,5 +285,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 756bf8139d8164418935d8ef37c30209, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCounterAttack
+  playerCombo: {fileID: 0}
   cooldown: 2
   spamRepeatThreshold: 3
