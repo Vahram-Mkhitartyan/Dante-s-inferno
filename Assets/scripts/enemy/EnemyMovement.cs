@@ -31,7 +31,7 @@ public class EnemyMovement : MonoBehaviour
 
             // Face player
             if (direction.x != 0)
-                spriteRenderer.flipX = direction.x < 0;
+                spriteRenderer.flipX = direction.x > 0;
         }
     }
 }

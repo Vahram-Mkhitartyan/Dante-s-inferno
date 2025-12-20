@@ -27,10 +27,11 @@ public class CharacterAnimator : MonoBehaviour
     public GameObject ArrowPrefab;
     bool IsFireArrow=true;
 
+
     void Awake()
     {
         //Assigns characterAnimator to the first child of this transform. Change it to your animation gameobject if you dont want it to be the first transform
-        characterSkeleton = transform.GetChild(0).GetComponent<SkeletonAnimation>();
+        characterSkeleton = GetComponent<SkeletonAnimation>();
 
         //Access the class responsible for equipping gears.
         AccGE = GetComponent<GearEquipper>();

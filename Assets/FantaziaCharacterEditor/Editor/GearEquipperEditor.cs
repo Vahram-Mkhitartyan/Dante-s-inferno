@@ -14,7 +14,7 @@ public class GearEquipperEditor : Editor
     public void OnEnable()
     {
         GE = (GearEquipper)target;
-        GE.ApplySkinChanges();
+       // GE.ApplySkinChanges();
     }
 
 
