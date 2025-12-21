@@ -43,25 +43,39 @@ public class PlayerSpineAnimationController : MonoBehaviour
         Invoke(nameof(Unlock), duration);
     }
 
-    public void RequestHurt(float duration)
-    {
-        if (isDead) return;
-
-        isLocked = true;
-        animState.SetAnimation(0, "Hurt", false);
-        Invoke(nameof(Unlock), duration);
-    }
-
     public void RequestDeath()
     {
         if (isDead) return;
 
         isDead = true;
-        animState.SetAnimation(0, "Die", false);
+        isLocked = true;
+
+        CancelInvoke();
+        animState.ClearTracks();
+        animState.SetAnimation(0, "Death", false);
     }
+
+
+    public void RequestHurt(float duration)
+    {
+        if (isDead) return;
+
+        CancelInvoke(nameof(Unlock));
+        isLocked = true;
+
+        animState.SetAnimation(0, "Hurt", false);
+        Invoke(nameof(Unlock), duration);
+        Debug.Log("HURT CALLED. isDead = " + isDead);
+    }
+
+
+    public bool IsLocked() => isLocked;
+    public bool IsDead() => isDead;
+    
 
     private void Unlock()
     {
+        if (isDead) return;
         isLocked = false;
     }
 }

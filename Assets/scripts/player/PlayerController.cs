@@ -20,6 +20,13 @@ public class PlayerController : MonoBehaviour
     private Collider2D col;
     private KnockbackReceiver knockback;
 
+    private bool isLocked;
+
+    public void SetLocked(bool locked)
+    {
+        isLocked = locked;
+    }
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -35,6 +42,13 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
+        if (isLocked)
+        {
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            return;
+        }
+
         float x = Input.GetAxisRaw("Horizontal");
 
 

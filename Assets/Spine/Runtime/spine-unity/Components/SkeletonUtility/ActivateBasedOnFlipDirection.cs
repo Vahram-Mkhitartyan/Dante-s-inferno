@@ -46,6 +46,7 @@ namespace Spine.Unity {
 		HingeJoint2D[] jointsNormalX;
 		HingeJoint2D[] jointsFlippedX;
 		ISkeletonComponent skeletonComponent;
+		
 
 		bool wasFlippedXBefore = false;
 

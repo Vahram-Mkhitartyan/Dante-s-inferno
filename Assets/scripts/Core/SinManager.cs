@@ -5,7 +5,7 @@ public class SinManager : MonoBehaviour
 {
     public static SinManager Instance { get; private set; }
 
-    public int Sin { get; private set; } = 0;
+    public int Sin { get; private set; } = 1;
 
     public event Action<int> OnSinChanged; // passes new Sin value
 
