@@ -88,7 +88,7 @@ public class AttackExecutor : MonoBehaviour
     void Apply(Collider2D target, int dmg, Vector2 force)
     {
         Health hp = target.GetComponent<Health>();
-        if (hp) hp.TakeDamage(dmg);
+        if (hp) hp.TakeDamage(dmg, transform.position);
 
         KnockbackReceiver kb = target.GetComponent<KnockbackReceiver>();
         if (kb) kb.ApplyKnockback(force, force.magnitude);

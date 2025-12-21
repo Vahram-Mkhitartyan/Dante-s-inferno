@@ -3,10 +3,12 @@ using UnityEngine;
 public class PlayerDamageReaction : MonoBehaviour
 {
     private Health health;
-    private PlayerSpineAnimationController anim;
-    private PlayerController controller;
+
 
     [SerializeField] private float hurtLockTime = 0.4f;
+    [SerializeField] private PlayerSpineAnimationController anim;
+    [SerializeField] private PlayerController controller;
+    [SerializeField] private float blockLockTime = 0.25f;
 
     void Awake()
     {
@@ -16,6 +18,7 @@ public class PlayerDamageReaction : MonoBehaviour
 
         health.OnDamaged += OnHurt;
         health.OnDeath += OnDeath;
+        health.OnBlocked += OnBlock;
     }
 
     void OnHurt()
@@ -37,6 +40,14 @@ public class PlayerDamageReaction : MonoBehaviour
         CancelInvoke();
         health.OnDamaged -= OnHurt;
         health.OnDeath -= OnDeath;
+    }
+    void OnBlock()
+    {
+        controller.SetLocked(true);
+
+        anim.RequestBlock(blockLockTime);
+
+        Invoke(nameof(Unlock), blockLockTime);
     }
 
     void Unlock()

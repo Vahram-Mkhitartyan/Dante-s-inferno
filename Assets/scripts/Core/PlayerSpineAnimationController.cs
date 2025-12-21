@@ -33,6 +33,36 @@ public class PlayerSpineAnimationController : MonoBehaviour
             SetIdle();
     }
 
+
+
+    public void RequestBlock(float duration)
+    {
+        if (isDead || isLocked) return;
+
+        CancelInvoke(nameof(Unlock));
+        isLocked = true;
+
+        animState.SetAnimation(0, "Defence", false);
+        Invoke(nameof(Unlock), duration);
+    }
+
+        public void SetDefence(bool defending)
+    {
+        if (isDead) return;
+
+        if (defending)
+        {
+            if (isLocked) return;
+            animState.SetAnimation(0, "Defence", true);
+        }
+        else
+        {
+            if (isLocked) return;
+            SetIdle();
+        }
+    }
+
+
     // ===== Actions =====
     public void RequestAttack(string animName, float duration)
     {
@@ -54,6 +84,8 @@ public class PlayerSpineAnimationController : MonoBehaviour
         animState.ClearTracks();
         animState.SetAnimation(0, "Death", false);
     }
+
+    
 
 
     public void RequestHurt(float duration)
@@ -78,4 +110,14 @@ public class PlayerSpineAnimationController : MonoBehaviour
         if (isDead) return;
         isLocked = false;
     }
+
+    public void ResetToIdle()
+    {
+        isDead = false;
+        isLocked = false;
+
+        CancelInvoke();
+        animState.SetAnimation(0, "Idle", true);
+    }
+
 }

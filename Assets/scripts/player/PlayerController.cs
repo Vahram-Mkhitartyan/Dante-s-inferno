@@ -12,15 +12,18 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundLayer;
 
     public int FacingDirection { get; private set; } = -1;
+    public Vector2 FacingDirectionVector => new Vector2(FacingDirection, 0f);
+
     public bool IsGrounded { get; private set; }
-    private bool wasGrounded;
-    private string currentAnim;
-    private Transform gfx;  
+    public bool IsDefending { get; private set; }
+
     private Rigidbody2D rb;
     private Collider2D col;
     private KnockbackReceiver knockback;
+    private Transform gfx;
 
     private bool isLocked;
+    private PlayerAnimations currentAnim; // ✅ SINGLE source of truth
 
     public void SetLocked(bool locked)
     {
@@ -33,16 +36,17 @@ public class PlayerController : MonoBehaviour
         col = GetComponent<Collider2D>();
         knockback = GetComponent<KnockbackReceiver>();
 
-        rb.gravityScale = 0; // we control gravity manually
+        rb.gravityScale = 0;
         rb.freezeRotation = true;
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+
         animator = GetComponentInChildren<CharacterAnimator>();
         gfx = animator.transform;
     }
 
     void Update()
     {
-
+        // 🔒 HARD LOCK (attacks / hurt / death)
         if (isLocked)
         {
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
@@ -51,7 +55,7 @@ public class PlayerController : MonoBehaviour
 
         float x = Input.GetAxisRaw("Horizontal");
 
-
+        // ---------- FACING ----------
         if (x != 0)
         {
             FacingDirection = (int)Mathf.Sign(x);
@@ -61,46 +65,60 @@ public class PlayerController : MonoBehaviour
             gfx.localScale = scale;
         }
 
-        if (Input.GetKeyDown(KeyCode.W) && IsGrounded)
+        // ---------- INPUT ----------
+        IsDefending = Input.GetKey(KeyCode.LeftShift);
+
+        if (Input.GetKeyDown(KeyCode.W) && IsGrounded && !IsDefending)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             IsGrounded = false;
         }
 
-        rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
+        // ---------- MOVEMENT ----------
+        if (IsDefending)
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        else
+            rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
 
-        // --- ANIMATION LOGIC (CORRECT) ---
+        // ---------- ANIMATION PRIORITY ----------
+        if (IsDefending)
+        {
+            PlayAnim(PlayerAnimations.Special); // Defence
+            return;
+        }
+
         if (!IsGrounded)
         {
-            PlayAnim("FullJump");
+            PlayAnim(PlayerAnimations.FullJump);
         }
         else if (Mathf.Abs(x) > 0.01f)
         {
-            PlayAnim("Walk");
+            PlayAnim(PlayerAnimations.Walk);
         }
         else
         {
-            PlayAnim("Idle");
+            PlayAnim(PlayerAnimations.Idle);
         }
-
     }
 
-    void PlayAnim(string anim)
+    void PlayAnim(PlayerAnimations anim)
     {
         if (currentAnim == anim) return;
         currentAnim = anim;
-        animator.ChangeAnimation(anim);
+
+        animator.ChangeAnimation(anim.ToString());
     }
+
 
     void FixedUpdate()
     {
         if (knockback && knockback.IsKnockedBack)
             return;
 
-        // gravity
+        // Gravity
         rb.linearVelocity += Vector2.down * gravity * Time.fixedDeltaTime;
 
-        // ground check
+        // Ground check
         IsGrounded = Physics2D.BoxCast(
             col.bounds.center,
             col.bounds.size,

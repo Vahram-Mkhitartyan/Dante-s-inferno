@@ -63,7 +63,7 @@ public class EnemyAttack : MonoBehaviour
     {
         if (playerHealth == null || playerHealth.IsDead) return;
 
-        playerHealth.TakeDamage(damage);
+        playerHealth.TakeDamage(damage, transform.position);
 
         KnockbackReceiver knockback = player.GetComponent<KnockbackReceiver>();
         if (knockback)
