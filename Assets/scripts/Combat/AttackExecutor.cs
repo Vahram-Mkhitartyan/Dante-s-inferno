@@ -22,6 +22,8 @@ public class AttackExecutor : MonoBehaviour
     public float spinRadius = 1.5f;
     public int spinDamage = 2;
 
+
+    [SerializeField] private PlayerSpineAnimationController animControl;
     public void Execute(AttackType attack)
     {
         switch (attack)
@@ -40,6 +42,7 @@ public class AttackExecutor : MonoBehaviour
 
     void Sword()
     {
+        animControl.RequestAttack("Attack1", 0.6f);
         Collider2D hit = Physics2D.OverlapCircle(
             hitOrigin.position, swordRange, enemyLayer);
 
@@ -49,6 +52,7 @@ public class AttackExecutor : MonoBehaviour
 
     void Kick()
     {
+        animControl.RequestAttack("Buff", 0.6f);
         Collider2D hit = Physics2D.OverlapCircle(
             GetHitOrigin(),
             1f,
@@ -73,6 +77,7 @@ public class AttackExecutor : MonoBehaviour
 
     void Spin()
     {
+        animControl.RequestAttack("Attack2", 0.6f);
         Collider2D[] hits = Physics2D.OverlapCircleAll(
             transform.position, spinRadius, enemyLayer);
 

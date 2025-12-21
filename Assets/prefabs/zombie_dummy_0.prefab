@@ -285,6 +285,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 756bf8139d8164418935d8ef37c30209, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCounterAttack
-  playerCombo: {fileID: 0}
+  playerCombo: {fileID: 5017797587373170337, guid: e7e8f31ff39ef46409464d773f0c0a4f, type: 3}
   cooldown: 2
   spamRepeatThreshold: 3
