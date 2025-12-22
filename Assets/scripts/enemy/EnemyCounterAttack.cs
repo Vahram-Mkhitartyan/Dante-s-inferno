@@ -5,6 +5,9 @@ public class EnemyCounterAttack : MonoBehaviour
     public ComboQueue playerCombo;
     public float cooldown = 2f;
     public int spamRepeatThreshold = 3;
+    public AttackExecutor playerAttackExecutor;
+    public float spamHitDelayMultiplier = 1.4f;
+    public float spamPenaltyDuration = 0.6f;
 
     private EnemyAttack enemyAttack;
     private float lastCounterTime;
@@ -24,6 +27,8 @@ public class EnemyCounterAttack : MonoBehaviour
         {
             Debug.Log("COUNTER TRIGGERED. Combo = " + playerCombo.DebugString());
             Counter();
+            if (playerAttackExecutor)
+                playerAttackExecutor.ApplyHitDelayPenalty(spamHitDelayMultiplier, spamPenaltyDuration);
             playerCombo.Clear();   // punish ONCE
             lastCounterTime = Time.time;
         }

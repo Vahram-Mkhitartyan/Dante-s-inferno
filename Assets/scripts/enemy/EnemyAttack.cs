@@ -63,14 +63,9 @@ public class EnemyAttack : MonoBehaviour
     {
         if (playerHealth == null || playerHealth.IsDead) return;
 
-        playerHealth.TakeDamage(damage, transform.position);
-
-        KnockbackReceiver knockback = player.GetComponent<KnockbackReceiver>();
-        if (knockback)
-        {
-            Vector2 dir = (player.position - transform.position).normalized;
-            knockback.ApplyKnockback(dir, 5f);
-        }
+        Vector2 dir = (player.position - transform.position).normalized;
+        Vector2 force = dir * 5f;
+        HitResolver.ApplyHit(player.gameObject, damage, force, transform.position);
     }
 
     void DisableAttack()

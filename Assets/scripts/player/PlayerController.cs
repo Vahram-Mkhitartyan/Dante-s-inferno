@@ -21,9 +21,11 @@ public class PlayerController : MonoBehaviour
     private Collider2D col;
     private KnockbackReceiver knockback;
     private Transform gfx;
+    private PlayerSpineAnimationController spineAnim;
 
     private bool isLocked;
-    private PlayerAnimations currentAnim; // ✅ SINGLE source of truth
+    private PlayerInputReader inputReader;
+    private PlayerAnimationDriver animationDriver;
 
     public void SetLocked(bool locked)
     {
@@ -42,18 +44,23 @@ public class PlayerController : MonoBehaviour
 
         animator = GetComponentInChildren<CharacterAnimator>();
         gfx = animator.transform;
+        spineAnim = GetComponentInChildren<PlayerSpineAnimationController>();
+
+        inputReader = new PlayerInputReader();
+        animationDriver = new PlayerAnimationDriver(animator);
     }
 
     void Update()
     {
         // 🔒 HARD LOCK (attacks / hurt / death)
-        if (isLocked)
+        if (isLocked || (spineAnim && spineAnim.IsLocked()))
         {
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
             return;
         }
 
-        float x = Input.GetAxisRaw("Horizontal");
+        PlayerInputState input = inputReader.Read();
+        float x = input.MoveX;
 
         // ---------- FACING ----------
         if (x != 0)
@@ -66,9 +73,9 @@ public class PlayerController : MonoBehaviour
         }
 
         // ---------- INPUT ----------
-        IsDefending = Input.GetKey(KeyCode.LeftShift);
+        IsDefending = input.DefendHeld;
 
-        if (Input.GetKeyDown(KeyCode.W) && IsGrounded && !IsDefending)
+        if (input.JumpPressed && IsGrounded && !IsDefending)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             IsGrounded = false;
@@ -81,32 +88,7 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
 
         // ---------- ANIMATION PRIORITY ----------
-        if (IsDefending)
-        {
-            PlayAnim(PlayerAnimations.Special); // Defence
-            return;
-        }
-
-        if (!IsGrounded)
-        {
-            PlayAnim(PlayerAnimations.FullJump);
-        }
-        else if (Mathf.Abs(x) > 0.01f)
-        {
-            PlayAnim(PlayerAnimations.Walk);
-        }
-        else
-        {
-            PlayAnim(PlayerAnimations.Idle);
-        }
-    }
-
-    void PlayAnim(PlayerAnimations anim)
-    {
-        if (currentAnim == anim) return;
-        currentAnim = anim;
-
-        animator.ChangeAnimation(anim.ToString());
+        animationDriver.UpdateAnimation(IsDefending, IsGrounded, x);
     }
 
 
