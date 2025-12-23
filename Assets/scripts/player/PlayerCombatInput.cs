@@ -11,7 +11,6 @@ public class PlayerCombatInput : MonoBehaviour
         combo = GetComponent<ComboQueue>();
         executor = GetComponent<AttackExecutor>();
         player = GetComponent<PlayerController>();
-        Debug.Log("PlayerCombatInput AWAKE on ");
     }
 
     void Update()

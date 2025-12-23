@@ -14,7 +14,6 @@ public class EnemyCounterAttack : MonoBehaviour
 
     void Awake()
     {
-        Debug.Log("EnemyCounterAttack AWAKE on ");
         enemyAttack = GetComponent<EnemyAttack>();
     }
 
@@ -25,7 +24,7 @@ public class EnemyCounterAttack : MonoBehaviour
 
         if (playerCombo.IsSameSpam(spamRepeatThreshold) || playerCombo.IsAlternatingSpam(spamRepeatThreshold))
         {
-            Debug.Log("COUNTER TRIGGERED. Combo = " + playerCombo.DebugString());
+            // Spam detected: counterattack and apply temporary player hit delay.
             Counter();
             if (playerAttackExecutor)
                 playerAttackExecutor.ApplyHitDelayPenalty(spamHitDelayMultiplier, spamPenaltyDuration);

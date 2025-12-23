@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2a2e7ff84cfe24658874629dcf6bdb72
+guid: 602af626ad60c48d39fbad57a8426efb
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2781456786213209708
-    second: ChatGPT Image Dec 18, 2025, 02_35_29 AM copy_0
+      213: -7027016604561600530
+    second: canoe_front_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ChatGPT Image Dec 18, 2025, 02_35_29 AM copy_0
+      name: canoe_front_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1536
-        height: 297
+        width: 1172
+        height: 286
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 49979ab2ac74669d0800000000000000
-      internalID: -2781456786213209708
+      spriteID: eef855ef0a50b7e90800000000000000
+      internalID: -7027016604561600530
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ChatGPT Image Dec 18, 2025, 02_35_29 AM copy_0: -2781456786213209708
+      canoe_front_0: -7027016604561600530
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -10,7 +10,7 @@ public class GearEquipper : MonoBehaviour
     //Script responsible for equipping the gear on the character
     //It must be attached to the parent of the character SkeletionAnimation
 
-    SkeletonAnimation characterAnimator;
+    [SerializeField] private SkeletonAnimation characterAnimator;
     public Jobs Job;
     public int Melee;
     public int Shield;
@@ -30,7 +30,7 @@ public class GearEquipper : MonoBehaviour
 
     private void Start()
     {
-        characterAnimator = transform.GetChild(0).GetComponent<SkeletonAnimation>();
+        EnsureCharacterAnimator();
         ApplySkinChanges();
     }
 
@@ -44,11 +44,7 @@ public class GearEquipper : MonoBehaviour
     {
         if (characterAnimator == null)
         {
-            characterAnimator = transform.GetChild(0).GetComponent<SkeletonAnimation>();
-            if (characterAnimator == null)
-            {
-                Debug.Log("Check that the character gameobject has a SkeletonAnimation child");
-            }
+            EnsureCharacterAnimator();
             return;
         }
 
@@ -111,6 +107,20 @@ public class GearEquipper : MonoBehaviour
         //Sets the new created skin on the character SkeletonAnimation
         skeleton.SetSkin(NewCustomSkin);
         skeleton.SetSlotsToSetupPose();
+    }
+
+    private void EnsureCharacterAnimator()
+    {
+        if (characterAnimator != null)
+        {
+            return;
+        }
+
+        characterAnimator = GetComponentInChildren<SkeletonAnimation>();
+        if (characterAnimator == null)
+        {
+            Debug.Log("Check that this GameObject or its children have a SkeletonAnimation component.");
+        }
     }
 
 }

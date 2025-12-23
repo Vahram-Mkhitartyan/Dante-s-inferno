@@ -33,7 +33,6 @@ public class EnemyDamageReaction : MonoBehaviour
         {
             int add = state.IsHostile ? 0 : 3;
             SinManager.Instance.AddSin(add);
-            Debug.Log($"[SIN AWARD] {name} IsHostile={state.IsHostile} +{add}");
         }
 
         yield return new WaitForSecondsRealtime(destroyDelay);

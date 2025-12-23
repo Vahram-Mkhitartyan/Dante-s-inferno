@@ -26,7 +26,6 @@ public class SeedManager : MonoBehaviour
             seed = Environment.TickCount;
 
         Rng = new System.Random(seed);
-        Debug.Log($"[SeedManager] Seed = {seed}");
     }
 
     // Deterministic helpers

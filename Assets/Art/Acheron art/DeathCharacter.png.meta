@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: bd16010dd9c454a47a9fd730818cab4b
+guid: b588dba2195e94a21b6c55da94959b16
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5464304282590597430
-    second: ChatGPT Image Dec 18, 2025, 03_49_47 AM_0
+      213: 6029991727544228543
+    second: DeathCharacter_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ChatGPT Image Dec 18, 2025, 03_49_47 AM_0
+      name: DeathCharacter_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 8
-        width: 1022
-        height: 1470
+        x: 0
+        y: 0
+        width: 1046
+        height: 847
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 631557c3bcb15db40800000000000000
-      internalID: 5464304282590597430
+      spriteID: fba51d62785dea350800000000000000
+      internalID: 6029991727544228543
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ChatGPT Image Dec 18, 2025, 03_49_47 AM_0: 5464304282590597430
+      DeathCharacter_0: 6029991727544228543
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

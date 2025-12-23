@@ -49,6 +49,7 @@ public class AttackExecutor : MonoBehaviour
         if (queued.Count == 0) return;
         if (animControl && animControl.IsLocked()) return;
 
+        // Buffered inputs execute as soon as the current attack unlocks.
         ExecuteNow(queued.Dequeue());
     }
 

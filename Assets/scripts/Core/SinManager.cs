@@ -25,7 +25,6 @@ public class SinManager : MonoBehaviour
         if (amount <= 0) return;
 
         Sin += amount;
-        Debug.Log($"[Sin] +{amount} -> Total Sin = {Sin}");
 
         OnSinChanged?.Invoke(Sin);
     }

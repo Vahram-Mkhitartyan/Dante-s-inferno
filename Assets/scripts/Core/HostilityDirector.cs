@@ -28,7 +28,6 @@ public class HostilityDirector : MonoBehaviour
     {
         if (!SeedManager.Instance)
         {
-            Debug.LogError("No SeedManager in scene.");
             return;
         }
 
@@ -106,7 +105,6 @@ public class HostilityDirector : MonoBehaviour
             b.Arm(false);
         }
 
-        Debug.Log($"[Backstab] Potential traitors locked = {count}/{all.Count}");
     }
    
 
@@ -160,10 +158,6 @@ public class HostilityDirector : MonoBehaviour
         for (int i = 0; i < need && i < neutrals.Count; i++)
             neutrals[i].SetHostile(true);
 
-        Debug.Log(
-            $"[Hostility] Sin={sin} Ratio={finalRatio:0.00} " +
-            $"Hostile={currentHostile + Mathf.Min(need, neutrals.Count)}/{cached.Count}"
-        );
     }
 
     // -----------------------------
@@ -194,7 +188,6 @@ public class HostilityDirector : MonoBehaviour
         for (int i = 0; i < target && i < potentials.Count; i++)
             potentials[i].Arm(true);
 
-        Debug.Log($"[Backstab] Active {target}/{potentials.Count} (Sin={sin})");
     }
 
 }

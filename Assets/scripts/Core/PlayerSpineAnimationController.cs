@@ -97,7 +97,6 @@ public class PlayerSpineAnimationController : MonoBehaviour
 
         animState.SetAnimation(0, "Hurt", false);
         Invoke(nameof(Unlock), duration);
-        Debug.Log("HURT CALLED. isDead = " + isDead);
     }
 
 

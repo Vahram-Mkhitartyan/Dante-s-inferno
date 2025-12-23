@@ -44,7 +44,6 @@ public class Health : MonoBehaviour
             if (dot > 0f)
             {
                 OnBlocked?.Invoke();
-                Debug.Log("BLOCKED");
                 return;
             }
         }
