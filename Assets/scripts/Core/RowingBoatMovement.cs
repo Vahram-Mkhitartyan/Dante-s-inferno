@@ -16,7 +16,7 @@ public class RowingBoatMovement : MonoBehaviour
     public Vector2 moveDirection = Vector2.right;
 
     private float velocity;
-    private bool rowing;
+    //private bool rowing;
     
 
     void Start()
@@ -29,7 +29,7 @@ public class RowingBoatMovement : MonoBehaviour
     {
         float dt = Time.deltaTime;
 
-        //Fd = a(row)*t - kv|v| * dt
+        //Fd = a(row)*t - kv|v| * t
 
         // Apply drag (always)
         transform.position += (Vector3)(moveDirection * (riverSpeed + velocity) * dt);
@@ -51,7 +51,7 @@ public class RowingBoatMovement : MonoBehaviour
 
     IEnumerator ApplyStroke()
     {
-        rowing = true;
+        //rowing = true;
         float t = 0f;
 
         while (t < strokeDuration)
@@ -64,6 +64,6 @@ public class RowingBoatMovement : MonoBehaviour
             yield return null;
         }
 
-        rowing = false;
+        //rowing = false;
     }
 }
