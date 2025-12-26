@@ -32,12 +32,12 @@ public class RowingBoatMovement : MonoBehaviour
         //Fd = a(row)*t - kv|v| * t
 
         // Apply drag (always)
-        transform.position += (Vector3)(moveDirection * (riverSpeed + velocity) * dt);
+        
         velocity -= quadraticDrag * velocity * Mathf.Abs(velocity) * dt;
         velocity -= linearDrag * velocity * dt;
 
         // Move boat
-        transform.position += (Vector3)(moveDirection * velocity * dt);
+        transform.position += (Vector3)(moveDirection * (riverSpeed + velocity) * dt);
     }
 
     IEnumerator RowRoutine()
