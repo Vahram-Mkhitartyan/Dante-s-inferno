@@ -68,9 +68,6 @@ public class Health : MonoBehaviour
         currentHealth = maxHealth;
         isDying = false;
     }
-
-
-
     
     IEnumerator BlinkRoutine()
     {

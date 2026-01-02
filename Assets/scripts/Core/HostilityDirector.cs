@@ -98,7 +98,7 @@ public class HostilityDirector : MonoBehaviour
 
         for (int i = 0; i < all.Count; i++)
         {
-            var b = all[i].GetComponent<BackStabber>();
+            var b = all[i].GetComponent<Backstabber>();
             if (!b) continue;
 
             b.SetPotentialTraitor(i < count);
@@ -171,10 +171,10 @@ public class HostilityDirector : MonoBehaviour
         int sin = SinManager.Instance ? SinManager.Instance.Sin : 0;
         float finalRatio = Mathf.Clamp01(baseBackstabRatio + sin * backstabPerSin);
 
-        List<BackStabber> potentials = new List<BackStabber>();
+        List<Backstabber> potentials = new List<Backstabber>();
         foreach (var e in cached)
         {
-            var b = e.GetComponent<BackStabber>();
+            var b = e.GetComponent<Backstabber>();
             if (b && b.IsPotentialTraitor && !e.IsHostile)
                 potentials.Add(b);
         }

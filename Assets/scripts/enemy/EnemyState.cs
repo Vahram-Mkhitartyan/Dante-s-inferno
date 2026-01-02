@@ -2,22 +2,10 @@ using UnityEngine;
 
 public class EnemyState : MonoBehaviour
 {
-    public bool IsHostile { get; private set; } = false;
+    public bool IsHostile { get; private set; } = true;
 
-    private EnemyMovement move;
-    private EnemyAttack attack;
-
-    void Awake()
+    public void SetHostile(bool value)
     {
-        move = GetComponent<EnemyMovement>();
-        attack = GetComponent<EnemyAttack>();
-    }
-
-    public void SetHostile(bool hostile)
-    {
-        IsHostile = hostile;
-
-        if (move) move.enabled = hostile;
-        if (attack) attack.enabled = hostile;
+        IsHostile = value;
     }
 }
