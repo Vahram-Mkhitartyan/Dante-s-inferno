@@ -189,7 +189,7 @@ namespace Water2D
 
         public void GetAllObstructors()
         {
-            foreach (var r in GameObject.FindObjectsOfType<Obstructor>(true))
+            foreach (var r in UnityEngine.Object.FindObjectsByType<Obstructor>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (!obstructors.ContainsKey(r.transform)) AddObstructor(r.GetComponent<Obstructor>().data);
             }

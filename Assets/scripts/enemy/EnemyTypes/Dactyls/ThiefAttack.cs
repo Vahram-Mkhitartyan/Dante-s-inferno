@@ -25,36 +25,43 @@ public class ThiefAttack : MonoBehaviour, IEnemyAttack
 
     private bool lastHitWasBlocked;
 
-    // 🧠 Stored stolen gear (only one piece per thief)
-    private System.Action restoreAction;
+    // Stores a single stolen gear slot so it can be restored on death.
+    private GearSlot stolenSlot = GearSlot.None;
+    private int stolenValue;
     private bool hasStolen;
+
+    private enum GearSlot
+    {
+        None,
+        Helmet,
+        Shoulder,
+        Armor,
+        Arm,
+        Feet
+    }
 
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (player == null)
         {
-            Debug.LogError("[ThiefAttack] Player not found!");
             return;
         }
 
-        // Player health (block detection)
+        // Listen for block events to avoid stealing on blocked hits.
         playerHealth = player.GetComponent<Health>();
         if (playerHealth != null)
         {
-            playerHealth.OnBlocked += () =>
-            {
-                lastHitWasBlocked = true;
-            };
+            playerHealth.OnBlocked += OnPlayerBlocked;
         }
 
-        // Player gear (indirect, untouched)
+        // Access player gear from children (if present) to steal a piece.
         playerGear = player.GetComponentInChildren<GearEquipper>();
 
-        // Movement
+        // Movement used for flee behavior after a successful steal.
         thiefMovement = GetComponent<ThiefMovement>();
 
-        // Thief health (for death restore)
+        // Restore stolen gear when the thief dies.
         thiefHealth = GetComponent<Health>();
         if (thiefHealth != null)
         {
@@ -62,13 +69,22 @@ public class ThiefAttack : MonoBehaviour, IEnemyAttack
         }
     }
 
+    void OnDestroy()
+    {
+        if (playerHealth != null)
+            playerHealth.OnBlocked -= OnPlayerBlocked;
+        if (thiefHealth != null)
+            thiefHealth.OnDeath -= OnThiefDeath;
+    }
+
     void Update()
     {
         if (player == null) return;
         if (Time.time < lastAttack + cooldown) return;
 
-        float dist = Vector2.Distance(transform.position, player.position);
-        if (dist > range) return;
+        float rangeSqr = range * range;
+        if (((Vector2)transform.position - (Vector2)player.position).sqrMagnitude > rangeSqr)
+            return;
 
         TryAttack(player);
     }
@@ -86,9 +102,7 @@ public class ThiefAttack : MonoBehaviour, IEnemyAttack
             transform.position
         );
 
-        // Attempt steal only if:
-        // - not blocked
-        // - hasn't already stolen
+        // Attempt steal only if the hit landed and the thief hasn't stolen yet.
         if (!lastHitWasBlocked && !hasStolen && playerGear != null && Random.value <= stealChance)
         {
             TryStealArmor(playerGear);
@@ -97,68 +111,101 @@ public class ThiefAttack : MonoBehaviour, IEnemyAttack
 
     bool TryStealArmor(GearEquipper gear)
     {
-        List<System.Action> stealActions = new List<System.Action>();
-        List<System.Action> restoreActions = new List<System.Action>();
+        GearSlot[] slots = new GearSlot[5];
+        int count = 0;
 
         if (gear.Helmet != 0)
         {
-            int v = gear.Helmet;
-            stealActions.Add(() => gear.Helmet = 0);
-            restoreActions.Add(() => gear.Helmet = v);
+            slots[count++] = GearSlot.Helmet;
         }
         if (gear.Shoulder != 0)
         {
-            int v = gear.Shoulder;
-            stealActions.Add(() => gear.Shoulder = 0);
-            restoreActions.Add(() => gear.Shoulder = v);
+            slots[count++] = GearSlot.Shoulder;
         }
         if (gear.Armor != 0)
         {
-            int v = gear.Armor;
-            stealActions.Add(() => gear.Armor = 0);
-            restoreActions.Add(() => gear.Armor = v);
+            slots[count++] = GearSlot.Armor;
         }
         if (gear.Arm != 0)
         {
-            int v = gear.Arm;
-            stealActions.Add(() => gear.Arm = 0);
-            restoreActions.Add(() => gear.Arm = v);
+            slots[count++] = GearSlot.Arm;
         }
         if (gear.Feet != 0)
         {
-            int v = gear.Feet;
-            stealActions.Add(() => gear.Feet = 0);
-            restoreActions.Add(() => gear.Feet = v);
+            slots[count++] = GearSlot.Feet;
         }
 
-        if (stealActions.Count == 0)
+        if (count == 0)
             return false;
 
-        int index = Random.Range(0, stealActions.Count);
+        int index = Random.Range(0, count);
+        GearSlot selected = slots[index];
 
-        // Steal
-        stealActions[index].Invoke();
+        // Pick one gear slot to steal, then store its restore info.
+        switch (selected)
+        {
+            case GearSlot.Helmet:
+                stolenValue = gear.Helmet;
+                gear.Helmet = 0;
+                break;
+            case GearSlot.Shoulder:
+                stolenValue = gear.Shoulder;
+                gear.Shoulder = 0;
+                break;
+            case GearSlot.Armor:
+                stolenValue = gear.Armor;
+                gear.Armor = 0;
+                break;
+            case GearSlot.Arm:
+                stolenValue = gear.Arm;
+                gear.Arm = 0;
+                break;
+            case GearSlot.Feet:
+                stolenValue = gear.Feet;
+                gear.Feet = 0;
+                break;
+        }
         gear.ApplySkinChanges();
 
-        // Store restore action
-        restoreAction = restoreActions[index];
+        stolenSlot = selected;
         hasStolen = true;
 
-        // Flee
+        // Flee briefly after a successful steal.
         thiefMovement?.TriggerFlee(fleeDuration);
 
-        Debug.Log("[ThiefAttack] 🩸 Stole gear — recoverable on death");
         return true;
     }
 
     void OnThiefDeath()
     {
-        if (!hasStolen || restoreAction == null || playerGear == null)
+        if (!hasStolen || stolenSlot == GearSlot.None || playerGear == null)
             return;
 
-        restoreAction.Invoke();
+        // Return the stolen gear piece on death.
+        switch (stolenSlot)
+        {
+            case GearSlot.Helmet:
+                playerGear.Helmet = stolenValue;
+                break;
+            case GearSlot.Shoulder:
+                playerGear.Shoulder = stolenValue;
+                break;
+            case GearSlot.Armor:
+                playerGear.Armor = stolenValue;
+                break;
+            case GearSlot.Arm:
+                playerGear.Arm = stolenValue;
+                break;
+            case GearSlot.Feet:
+                playerGear.Feet = stolenValue;
+                break;
+        }
         playerGear.ApplySkinChanges();
 
-        Debug.Log("[ThiefAttack] ☠️ Thief killed — gear returned");
+    }
+
+    void OnPlayerBlocked()
+    {
+        lastHitWasBlocked = true;
     }
 }

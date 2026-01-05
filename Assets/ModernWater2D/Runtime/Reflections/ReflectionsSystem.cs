@@ -170,7 +170,7 @@ namespace Water2D
 
         public void GetAllReflectors()
         {
-            foreach (var r in GameObject.FindObjectsOfType<Reflector>(true))
+            foreach (var r in UnityEngine.Object.FindObjectsByType<Reflector>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (!reflectors.ContainsKey(r.transform)) AddReflector(r.data);
             }

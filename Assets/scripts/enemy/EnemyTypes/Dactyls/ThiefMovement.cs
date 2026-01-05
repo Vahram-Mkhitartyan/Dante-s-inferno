@@ -7,30 +7,43 @@ public class ThiefMovement : MonoBehaviour, IEnemyMovement
     public float stopDistance = 1.0f;
 
     private float fleeUntilTime = -1f;
+    private Rigidbody2D rb;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
 
     public void TriggerFlee(float duration)
     {
         fleeUntilTime = Time.time + duration;
-        Debug.Log("[ThiefMovement] 🏃 Flee triggered");
     }
 
     public void TickMovement(Transform target)
     {
         if (target == null) return;
 
-        // FLEE
+        // Flee overrides normal movement for a short window.
         if (Time.time < fleeUntilTime)
         {
             Vector2 away = ((Vector2)transform.position - (Vector2)target.position).normalized;
-            transform.position += (Vector3)(away * moveSpeed * fleeSpeedMultiplier * Time.deltaTime);
+            Move(away * moveSpeed * fleeSpeedMultiplier * Time.deltaTime);
             return;
         }
 
-        // NORMAL MOVE
+        // Normal chase until within stop distance.
         float dist = Vector2.Distance(transform.position, target.position);
         if (dist <= stopDistance) return;
 
         Vector2 dir = ((Vector2)target.position - (Vector2)transform.position).normalized;
-        transform.position += (Vector3)(dir * moveSpeed * Time.deltaTime);
+        Move(dir * moveSpeed * Time.deltaTime);
+    }
+
+    void Move(Vector2 delta)
+    {
+        if (rb != null)
+            rb.MovePosition(rb.position + delta);
+        else
+            transform.position += (Vector3)delta;
     }
 }

@@ -33,10 +33,8 @@ public class GigantesAttack : MonoBehaviour, IEnemyAttack
         float dist = Vector2.Distance(transform.position, player.position);
         if (dist > range) return;
 
-        // Snapshot once
+        // Snapshot player position once to prevent last-second dodges.
         lockedTargetPosition = player.position;
-
-        Debug.Log($"[GigantesAttack] 🎯 SNAPSHOT at {lockedTargetPosition}");
 
         StartCoroutine(AttackRoutine());
     }
@@ -44,19 +42,16 @@ public class GigantesAttack : MonoBehaviour, IEnemyAttack
     // Required by interface, but NOT used externally
     public void TryAttack(Transform target)
     {
-        // Intentionally empty or could redirect to Update logic
+        // Intentionally empty: this enemy self-initiates attacks via Update.
     }
 
     IEnumerator AttackRoutine()
     {
         isAttacking = true;
-        Debug.Log("[GigantesAttack] ⚠️ WIND-UP");
 
         yield return new WaitForSeconds(windupTime);
 
         Vector2 dir = (lockedTargetPosition - (Vector2)transform.position).normalized;
-
-        Debug.Log("[GigantesAttack] 💥 HIT");
 
         HitResolver.ApplyHit(
             player.gameObject,
@@ -65,13 +60,10 @@ public class GigantesAttack : MonoBehaviour, IEnemyAttack
             transform.position
         );
 
-        Debug.Log("[GigantesAttack] 🧱 STUCK");
-
         yield return new WaitForSeconds(stuckTime);
 
         isAttacking = false;
         lastAttack = Time.time;
 
-        Debug.Log("[GigantesAttack] 🔓 RECOVERED");
     }
 }

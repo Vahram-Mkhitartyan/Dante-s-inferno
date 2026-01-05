@@ -16,6 +16,7 @@ public class PlayerDamageReaction : MonoBehaviour
         anim = GetComponentInChildren<PlayerSpineAnimationController>();
         controller = GetComponent<PlayerController>();
 
+        // Hook into health events for hurt, death, and block reactions.
         health.OnDamaged += OnHurt;
         health.OnDeath += OnDeath;
         health.OnBlocked += OnBlock;
@@ -25,6 +26,7 @@ public class PlayerDamageReaction : MonoBehaviour
     {
         if (health.IsDead) return;
 
+        // Lock player input briefly while playing the hurt animation.
         anim.RequestHurt(hurtLockTime);
         controller.SetLocked(true);
 
@@ -36,7 +38,7 @@ public class PlayerDamageReaction : MonoBehaviour
         anim.RequestDeath();
         controller.SetLocked(true);
 
-        // hard stop
+        // Hard stop any pending unlocks and event handlers.
         CancelInvoke();
         health.OnDamaged -= OnHurt;
         health.OnDeath -= OnDeath;
@@ -45,6 +47,7 @@ public class PlayerDamageReaction : MonoBehaviour
     {
         controller.SetLocked(true);
 
+        // Short lock/animation for a successful block.
         anim.RequestBlock(blockLockTime);
 
         Invoke(nameof(Unlock), blockLockTime);
