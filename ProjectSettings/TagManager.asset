@@ -18,8 +18,8 @@ TagManager:
   - player
   - GroundLayer
   - WaterPostProcessing
-  - 
-  - 
+  - Reflections
+  - Obstructors
   - 
   - 
   - 

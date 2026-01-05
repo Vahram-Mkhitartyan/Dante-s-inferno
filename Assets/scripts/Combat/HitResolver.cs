@@ -6,10 +6,18 @@ public static class HitResolver
     {
         if (target == null) return;
 
-        Health hp = target.GetComponent<Health>();
+        // Support colliders on child objects.
+        Health hp = target.GetComponentInParent<Health>();
         if (hp) hp.TakeDamage(damage, attackerPosition);
 
-        KnockbackReceiver kb = target.GetComponent<KnockbackReceiver>();
-        if (kb) kb.ApplyKnockback(force, force.magnitude);
+        KnockbackReceiver kb = target.GetComponentInParent<KnockbackReceiver>();
+        if (kb)
+        {
+            kb.ApplyKnockback(force, force.magnitude);
+            return;
+        }
+
+        Rigidbody2D rb = target.GetComponentInParent<Rigidbody2D>();
+        if (rb) rb.AddForce(force, ForceMode2D.Impulse);
     }
 }

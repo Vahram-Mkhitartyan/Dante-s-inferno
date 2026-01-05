@@ -25,7 +25,7 @@ namespace Water2D
             {
                 if (_obstructorManager == null)
                 {
-                    if (FindObjectOfType<ObstructorManager>() != null) _obstructorManager = FindObjectOfType<ObstructorManager>();
+                    if (Object.FindAnyObjectByType<ObstructorManager>() != null) _obstructorManager = Object.FindAnyObjectByType<ObstructorManager>();
                     else
                     {
                         _obstructorManager = new GameObject("ObstructorManager").AddComponent<ObstructorManager>();
@@ -45,7 +45,7 @@ namespace Water2D
             {
                 if (_surfaceRenderer == null)
                 {
-                    if (FindObjectOfType<SurfaceRenderingManager>() != null) _surfaceRenderer = FindObjectOfType<SurfaceRenderingManager>();
+                    if (Object.FindAnyObjectByType<SurfaceRenderingManager>() != null) _surfaceRenderer = Object.FindAnyObjectByType<SurfaceRenderingManager>();
                     else
                     {
                         _surfaceRenderer = new GameObject("SurfaceRenderer").AddComponent<SurfaceRenderingManager>();
@@ -65,7 +65,7 @@ namespace Water2D
             {
                 if (_reflectionsManagerPlatformer == null)
                 {
-                    foreach (var system in FindObjectsOfType<ReflectionsSystem>(true)) if (system.name == "ReflectionsManagerPL") _reflectionsManagerPlatformer = system;
+                    foreach (var system in Object.FindObjectsByType<ReflectionsSystem>(FindObjectsInactive.Include, FindObjectsSortMode.None)) if (system.name == "ReflectionsManagerPL") _reflectionsManagerPlatformer = system;
 
                 }
                 if (_reflectionsManagerPlatformer == null)
@@ -90,7 +90,7 @@ namespace Water2D
             {
                 if (_reflectionsManagerRayMarch == null)
                 {
-                    foreach (var system in FindObjectsOfType<ReflectionsSystem>(true)) if (system.name == "ReflectionsManagerRM") _reflectionsManagerRayMarch = system;
+                    foreach (var system in Object.FindObjectsByType<ReflectionsSystem>(FindObjectsInactive.Include, FindObjectsSortMode.None)) if (system.name == "ReflectionsManagerRM") _reflectionsManagerRayMarch = system;
                 }
                 if (_reflectionsManagerRayMarch == null)
                 {
@@ -114,7 +114,7 @@ namespace Water2D
             {
                 if (_reflectionsManagerTopDown == null)
                 {
-                    foreach (var system in FindObjectsOfType<ReflectionsSystem>(true)) if (system.name == "ReflectionsManagerTD") _reflectionsManagerTopDown = system;
+                    foreach (var system in Object.FindObjectsByType<ReflectionsSystem>(FindObjectsInactive.Include, FindObjectsSortMode.None)) if (system.name == "ReflectionsManagerTD") _reflectionsManagerTopDown = system;
                     if (_reflectionsManagerTopDown == null)
                     {
                         _reflectionsManagerTopDown = new GameObject("ReflectionsManagerTD").AddComponent<ReflectionsSystem>();
@@ -227,7 +227,7 @@ namespace Water2D
             {
                 if (_managersParent == null)
                 {
-                    if (FindObjectOfType<ManagersParent>(true) != null) _managersParent = FindObjectOfType<ManagersParent>().transform;
+                    if (Object.FindFirstObjectByType<ManagersParent>(FindObjectsInactive.Include) != null) _managersParent = Object.FindFirstObjectByType<ManagersParent>().transform;
                     else { _managersParent = new GameObject(managersParentName).transform; if (!_managersParent.GetComponent<ManagersParent>()) _managersParent.gameObject.AddComponent<ManagersParent>(); }
                 }
                 return _managersParent;

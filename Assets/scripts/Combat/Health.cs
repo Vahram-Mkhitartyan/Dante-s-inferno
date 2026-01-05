@@ -13,6 +13,10 @@ public class Health : MonoBehaviour
     [Header("Hit Feedback")]
     public float blinkTime = 0.08f;
 
+    [Header("Death")]
+    public bool destroyOnDeath = true;
+    public float destroyDelay = 0f;
+
     private int currentHealth;
     private bool isDying;
     
@@ -59,6 +63,8 @@ public class Health : MonoBehaviour
         {
             isDying = true;
             OnDeath?.Invoke();
+            if (destroyOnDeath)
+                Destroy(gameObject, destroyDelay);
         }
     }
 

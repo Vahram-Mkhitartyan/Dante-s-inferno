@@ -6,13 +6,13 @@ public class EnemyController : MonoBehaviour
 
     private EnemyState state;
     private IEnemyMovement movement;
-    private IEnemyAttack attack;
+    private EnemyPerception perception;
 
     void Awake()
     {
         state = GetComponent<EnemyState>();
         movement = GetComponent<IEnemyMovement>();
-        attack = GetComponent<IEnemyAttack>();
+        perception = GetComponent<EnemyPerception>();
 
         Target = GameObject.FindGameObjectWithTag("Player")?.transform;
     }
@@ -22,7 +22,9 @@ public class EnemyController : MonoBehaviour
         if (!state || !state.IsHostile || Target == null)
             return;
 
+        if (perception != null && !perception.CanSeePlayer())
+            return;
+
         movement?.TickMovement(Target);
-        attack?.TryAttack(Target);
     }
 }

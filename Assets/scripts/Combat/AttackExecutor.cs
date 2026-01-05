@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class AttackExecutor : MonoBehaviour
 {
+    private static readonly string[] EnemyLayerNames = { "enemy", "Enemy" };
+
     [Header("Queue")]
     public int maxQueuedAttacks = 3;
 
@@ -37,6 +39,18 @@ public class AttackExecutor : MonoBehaviour
     [SerializeField] private PlayerSpineAnimationController animControl;
     private readonly Queue<AttackType> queued = new Queue<AttackType>();
     private Coroutine hitDelayRoutine;
+
+    void Awake()
+    {
+        EnsureEnemyLayer();
+    }
+
+#if UNITY_EDITOR
+    void OnValidate()
+    {
+        EnsureEnemyLayer();
+    }
+#endif
 
     void Update()
     {
@@ -183,5 +197,20 @@ public class AttackExecutor : MonoBehaviour
         yield return new WaitForSeconds(duration);
         hitDelayMultiplier = previous;
         hitDelayRoutine = null;
+    }
+
+    void EnsureEnemyLayer()
+    {
+        if (enemyLayer.value != 0) return;
+
+        foreach (var name in EnemyLayerNames)
+        {
+            int mask = LayerMask.GetMask(name);
+            if (mask != 0)
+            {
+                enemyLayer = mask;
+                break;
+            }
+        }
     }
 }

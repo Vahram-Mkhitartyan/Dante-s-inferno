@@ -23,7 +23,7 @@ namespace LeafUtils
             cmd.SetViewport(viewport);
 
             //draws mesh with out material
-            cmd.DrawMesh(RenderingUtils.fullscreenMesh, Matrix4x4.identity, mat, 0, 0);
+            CoreUtils.DrawFullScreen(cmd, mat);
 
             Graphics.ExecuteCommandBuffer(cmd);
             cmd.Release();

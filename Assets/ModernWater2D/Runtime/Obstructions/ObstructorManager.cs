@@ -39,7 +39,7 @@ namespace Water2D
         {
             if (instance == null)
             {
-                if (FindObjectOfType<ObstructorManager>()!= null) instance = FindObjectOfType<ObstructorManager>();
+                if (UnityEngine.Object.FindAnyObjectByType<ObstructorManager>()!= null) instance = UnityEngine.Object.FindAnyObjectByType<ObstructorManager>();
                 
             }
             return instance;
