@@ -68,7 +68,6 @@ public class Health : MonoBehaviour
         }
     }
 
-
     public void ResetHealth()
     {
         currentHealth = maxHealth;
@@ -82,4 +81,7 @@ public class Health : MonoBehaviour
         sr.enabled = true;
         yield return new WaitForSecondsRealtime(blinkTime * 0.5f);
     }
+
+
+
 }

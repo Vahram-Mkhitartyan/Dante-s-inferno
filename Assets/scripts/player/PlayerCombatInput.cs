@@ -5,12 +5,17 @@ public class PlayerCombatInput : MonoBehaviour
     private ComboQueue combo;
     private AttackExecutor executor;
     private PlayerController player;
+    public bool debugLogs = true;
 
     void Awake()
     {
         combo = GetComponent<ComboQueue>();
         executor = GetComponent<AttackExecutor>();
         player = GetComponent<PlayerController>();
+
+        if (debugLogs)
+        {
+        }
     }
 
     void Update()
@@ -28,7 +33,13 @@ public class PlayerCombatInput : MonoBehaviour
 
     void HandleInput(char input)
     {
-        combo.Register(input);
+        if (debugLogs)
+
+        if (combo == null || executor == null)
+        {
+            if (debugLogs)
+            return;
+        }
 
         switch (input)
         {
@@ -44,6 +55,8 @@ public class PlayerCombatInput : MonoBehaviour
                 executor.Execute(AttackType.Spin360);
                 break;
         }
+
+        if (debugLogs)
     }
 
 }

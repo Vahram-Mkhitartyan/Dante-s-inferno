@@ -24,6 +24,7 @@ public class SinManager : MonoBehaviour
     {
         if (amount <= 0) return;
 
+        int before = Sin;
         Sin += amount;
 
         OnSinChanged?.Invoke(Sin);

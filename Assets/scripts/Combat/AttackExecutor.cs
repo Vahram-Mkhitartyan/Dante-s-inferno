@@ -39,10 +39,12 @@ public class AttackExecutor : MonoBehaviour
     [SerializeField] private PlayerSpineAnimationController animControl;
     private readonly Queue<AttackType> queued = new Queue<AttackType>();
     private Coroutine hitDelayRoutine;
+    private ComboQueue combo;
 
     void Awake()
     {
         EnsureEnemyLayer();
+        combo = GetComponent<ComboQueue>();
     }
 
 #if UNITY_EDITOR
@@ -131,6 +133,7 @@ public class AttackExecutor : MonoBehaviour
             hitOrigin.position, swordRange, enemyLayer);
 
         if (!hit) yield break;
+        RegisterCombo('A');
         Apply(hit, swordDamage, Direction(hit) * swordKnockback);
     }
 
@@ -148,6 +151,7 @@ public class AttackExecutor : MonoBehaviour
 
         if (!hit) yield break;
 
+        RegisterCombo('B');
         float dir = GetFacingDirection();
         Vector2 force = new Vector2(dir * kickHorizontalForce, kickVerticalForce);
 
@@ -163,6 +167,9 @@ public class AttackExecutor : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapCircleAll(
             transform.position, spinRadius, enemyLayer);
 
+        if (hits.Length > 0)
+            RegisterCombo('C');
+
         foreach (var h in hits)
             Apply(h, spinDamage, Direction(h) * 5f);
     }
@@ -170,6 +177,11 @@ public class AttackExecutor : MonoBehaviour
     void Apply(Collider2D target, int dmg, Vector2 force)
     {
         HitResolver.ApplyHit(target.gameObject, dmg, force, transform.position);
+    }
+
+    void RegisterCombo(char input)
+    {
+        combo?.Register(input);
     }
 
     Vector2 GetHitOrigin()

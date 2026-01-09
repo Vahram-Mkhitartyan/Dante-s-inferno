@@ -22,6 +22,7 @@ public class ThiefAttack : MonoBehaviour, IEnemyAttack
     private GearEquipper playerGear;
     private ThiefMovement thiefMovement;
     private Health thiefHealth;
+    private EnemyState state;
 
     private bool lastHitWasBlocked;
 
@@ -67,6 +68,8 @@ public class ThiefAttack : MonoBehaviour, IEnemyAttack
         {
             thiefHealth.OnDeath += OnThiefDeath;
         }
+
+        state = GetComponent<EnemyState>();
     }
 
     void OnDestroy()
@@ -80,6 +83,7 @@ public class ThiefAttack : MonoBehaviour, IEnemyAttack
     void Update()
     {
         if (player == null) return;
+        if (state != null && !state.IsHostile) return;
         if (Time.time < lastAttack + cooldown) return;
 
         float rangeSqr = range * range;
@@ -91,6 +95,7 @@ public class ThiefAttack : MonoBehaviour, IEnemyAttack
 
     public void TryAttack(Transform target)
     {
+        if (state != null && !state.IsHostile) return;
         lastHitWasBlocked = false;
         lastAttack = Time.time;
 

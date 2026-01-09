@@ -5,9 +5,17 @@ public class DashAttack : MonoBehaviour, IEnemyAttack
     public float hitCooldown = 0.25f;
 
     private float lastHit;
+    private EnemyState state;
+
+    void Awake()
+    {
+        state = GetComponent<EnemyState>();
+    }
 
     public void TryAttack(Transform target)
     {
+        if (state != null && !state.IsHostile)
+            return;
         if (Time.time < lastHit + hitCooldown)
             return;
 

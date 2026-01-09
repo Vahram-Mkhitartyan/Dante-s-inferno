@@ -16,17 +16,20 @@ public class GigantesAttack : MonoBehaviour, IEnemyAttack
 
     private Transform player;
     private Vector2 lockedTargetPosition;
+    private EnemyState state;
 
     public bool IsCommitted => isAttacking;
 
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        state = GetComponent<EnemyState>();
     }
 
     void Update()
     {
         if (player == null) return;
+        if (state != null && !state.IsHostile) return;
         if (isAttacking) return;
         if (Time.time < lastAttack + cooldown) return;
 

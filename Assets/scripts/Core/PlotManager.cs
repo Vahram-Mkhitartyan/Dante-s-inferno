@@ -4,7 +4,7 @@ using System.Collections;
 public class PlotManager : MonoBehaviour
 {
     [Header("References")]
-    public WhisperManager whisper; // drag your whisper manager here
+    public WhisperManager whisper; //whisper manager here
 
     [Header("Timing")]
     public float startDelay = 1.5f;

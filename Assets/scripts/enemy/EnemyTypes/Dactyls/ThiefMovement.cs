@@ -41,9 +41,12 @@ public class ThiefMovement : MonoBehaviour, IEnemyMovement
 
     void Move(Vector2 delta)
     {
-        if (rb != null)
-            rb.MovePosition(rb.position + delta);
-        else
+        if (rb == null || rb.bodyType == RigidbodyType2D.Static || rb.constraints != RigidbodyConstraints2D.None)
+        {
             transform.position += (Vector3)delta;
+            return;
+        }
+
+        rb.MovePosition(rb.position + delta);
     }
 }
