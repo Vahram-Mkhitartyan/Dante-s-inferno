@@ -2,13 +2,11 @@ using UnityEngine;
 
 public class PlayerCombatInput : MonoBehaviour
 {
-    private ComboQueue combo;
     private AttackExecutor executor;
     private PlayerController player;
 
     void Awake()
     {
-        combo = GetComponent<ComboQueue>();
         executor = GetComponent<AttackExecutor>();
         player = GetComponent<PlayerController>();
     }
@@ -34,15 +32,15 @@ public class PlayerCombatInput : MonoBehaviour
         switch (input)
         {
             case 'A':
-                executor.Execute(AttackType.Sword);
+                executor.Execute(AttackType.TopDownSwing);
                 break;
 
             case 'B':
-                executor.Execute(AttackType.KickLauncher);
+                executor.Execute(AttackType.UpwardLauncher);
                 break;
 
             case 'C':
-                executor.Execute(AttackType.Spin360);
+                executor.Execute(AttackType.ForwardPierce);
                 break;
         }
     }

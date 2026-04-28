@@ -8,10 +8,14 @@ public class ThiefMovement : MonoBehaviour, IEnemyMovement
 
     private float fleeUntilTime = -1f;
     private Rigidbody2D rb;
+    private KnockbackReceiverNew knockback;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        knockback = GetComponent<KnockbackReceiverNew>();
+        if (knockback == null)
+            knockback = gameObject.AddComponent<KnockbackReceiverNew>();
     }
 
     public void TriggerFlee(float duration)
@@ -22,6 +26,7 @@ public class ThiefMovement : MonoBehaviour, IEnemyMovement
     public void TickMovement(Transform target)
     {
         if (target == null) return;
+        if (knockback != null && knockback.IsKnockedBack) return;
 
         // Flee overrides normal movement for a short window.
         if (Time.time < fleeUntilTime)
@@ -41,7 +46,7 @@ public class ThiefMovement : MonoBehaviour, IEnemyMovement
 
     void Move(Vector2 delta)
     {
-        if (rb == null || rb.bodyType == RigidbodyType2D.Static || rb.constraints != RigidbodyConstraints2D.None)
+        if (rb == null || rb.bodyType == RigidbodyType2D.Static)
         {
             transform.position += (Vector3)delta;
             return;

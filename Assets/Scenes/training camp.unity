@@ -1269,28 +1269,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 594203387}
     - target: {fileID: 3851111833580975434, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
-      propertyPath: swordKnockback
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 3851111833580975434, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
-      propertyPath: kickVerticalLift
-      value: 4
+      propertyPath: upwardLift
+      value: 1.35
       objectReference: {fileID: 0}
     - target: {fileID: 3851111833580975434, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
       propertyPath: hitDelayMultiplier
       value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 3851111833580975434, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
-      propertyPath: kickKnockbackForce
-      value: 15
+      propertyPath: upwardKnockbackForce
+      value: 6.5
       objectReference: {fileID: 0}
     - target: {fileID: 3851111833580975434, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
-      propertyPath: kickHorizontalForce
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 3851111833580975434, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
-      propertyPath: swordKnockbackForce
-      value: 120
+      propertyPath: topDownKnockbackForce
+      value: 5.5
       objectReference: {fileID: 0}
     - target: {fileID: 4477763040841341097, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2252,8 +2244,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b50756cfa0bc402b95e2075f625cae1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KnockbackReceiverNew
-  coefficient: 1
-  duration: 0.15
+  coefficient: 1.35
+  duration: 0.26
   clearVelocity: 1
   ignoreWhenDefending: 1
 --- !u!114 &1537008786

@@ -26,9 +26,9 @@ public class EnemyDamageReaction : MonoBehaviour
     {
         if (state != null)
         {
-            if (!state.IsHostile && SinManager.Instance != null)
+            if (!state.IsHostile)
             {
-                SinManager.Instance.AddSin(1);
+                PlayerActionEvents.RaiseNonHostileEnemyKilled();
             }
 
             state.SetHostile(false);

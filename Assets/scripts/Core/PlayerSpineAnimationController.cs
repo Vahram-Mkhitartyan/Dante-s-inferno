@@ -4,6 +4,8 @@ using Spine.Unity;
 
 public class PlayerSpineAnimationController : MonoBehaviour
 {
+    public string deathAnimationName = "Death";
+
     private SkeletonAnimation skeleton;
     private Spine.AnimationState animState;
 
@@ -82,7 +84,7 @@ public class PlayerSpineAnimationController : MonoBehaviour
 
         CancelInvoke();
         animState.ClearTracks();
-        animState.SetAnimation(0, "Death", false);
+        animState.SetAnimation(0, ResolveAnimationName(deathAnimationName), false);
     }
 
     
@@ -117,6 +119,17 @@ public class PlayerSpineAnimationController : MonoBehaviour
 
         CancelInvoke();
         animState.SetAnimation(0, "Idle", true);
+    }
+
+    string ResolveAnimationName(string requested)
+    {
+        if (skeleton != null && skeleton.Skeleton?.Data?.FindAnimation(requested) != null)
+            return requested;
+
+        if (skeleton != null && skeleton.Skeleton?.Data?.FindAnimation("death") != null)
+            return "death";
+
+        return requested;
     }
 
 }

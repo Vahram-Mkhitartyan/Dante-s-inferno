@@ -11,6 +11,6 @@ public static class HitResolver
         if (hp) hp.TakeDamage(damage, attackerPosition);
 
         if (force != Vector2.zero)
-            KnockbackSystemNew.Apply(target, force.normalized, force.magnitude);
+            KnockbackSystemNew.Apply(hp != null ? hp.gameObject : target, force.normalized, force.magnitude);
     }
 }

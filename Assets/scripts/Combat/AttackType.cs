@@ -1,6 +1,6 @@
 public enum AttackType
 {
-    Sword,
-    KickLauncher,
-    Spin360
+    TopDownSwing,
+    UpwardLauncher,
+    ForwardPierce
 }

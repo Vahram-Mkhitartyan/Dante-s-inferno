@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: 
   skeletonDataAsset: {fileID: 11400000, guid: d757c04600c957b4d8001489aeeb22e6, type: 2}
   initialSkinName: 0
@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6f2be31b9f9ee9b439dfbb8e417f3652, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::GearEquipper
   Job: 0
   Melee: 0
@@ -283,6 +283,8 @@ GameObject:
   - component: {fileID: 7476386912548693741}
   - component: {fileID: 4881182496758585087}
   - component: {fileID: 8050478919886481336}
+  - component: {fileID: 558087319012440192}
+  - component: {fileID: 558087319012440193}
   - component: {fileID: 793482171538161125}
   - component: {fileID: 2117438558275069013}
   - component: {fileID: 8700346814614864307}
@@ -452,7 +454,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 5
   blinkTime: 0.08
-  deathDelay: 0.08
+  destroyOnDeath: 1
+  destroyDelay: 0
 --- !u!114 &8050478919886481336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -465,6 +468,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f277e5b0dd924ec7b65f2136e8675e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KnockbackReceiver
+  knockbackMultiplier: 1
+  knockbackDuration: 0.22
+--- !u!114 &558087319012440192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5126467861962259383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b50756cfa0bc402b95e2075f625cae1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::KnockbackReceiverNew
+  coefficient: 1.35
+  duration: 0.26
+  clearVelocity: 1
+  ignoreWhenDefending: 1
+--- !u!114 &558087319012440193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5126467861962259383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 659c166f9298a4250af607c07fa316a1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDamageReaction
+  hurtLockTime: 0.4
+  anim: {fileID: 2939037815159614840}
+  controller: {fileID: 7476386912548693741}
+  blockLockTime: 0.25
 --- !u!114 &793482171538161125
 MonoBehaviour:
   m_ObjectHideFlags: 0

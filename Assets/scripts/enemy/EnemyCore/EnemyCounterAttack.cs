@@ -10,6 +10,7 @@ public class EnemyCounterAttack : MonoBehaviour
 
     private IEnemyAttack enemyAttack;
     private EnemyState state;
+    private AttackExecutor playerAttackExecutor;
     private float lastCounterTime;
 
     void Awake()
@@ -19,20 +20,18 @@ public class EnemyCounterAttack : MonoBehaviour
 
         if (playerCombo == null)
         {
-            Transform player = GameObject.FindGameObjectWithTag("Player")?.transform;
-            if (player != null)
-                playerCombo = player.GetComponent<ComboQueue>();
+            ResolvePlayerReferences();
+        }
+        else
+        {
+            playerAttackExecutor = playerCombo.GetComponent<AttackExecutor>();
         }
     }
 
     void Update()
     {
         if (playerCombo == null)
-        {
-            Transform player = GameObject.FindGameObjectWithTag("Player")?.transform;
-            if (player != null)
-                playerCombo = player.GetComponent<ComboQueue>();
-        }
+            ResolvePlayerReferences();
 
         if (enemyAttack == null || playerCombo == null)
             return;
@@ -58,6 +57,17 @@ public class EnemyCounterAttack : MonoBehaviour
     void Counter()
     {
         Transform target = playerCombo.GetComponentInParent<Health>()?.transform ?? playerCombo.transform;
+        playerAttackExecutor?.ApplyHitDelayPenalty(spamHitMultiplier, spamPenaltyDuration);
         enemyAttack.TryAttack(target);
+    }
+
+    void ResolvePlayerReferences()
+    {
+        Transform player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (player == null)
+            return;
+
+        playerCombo = player.GetComponent<ComboQueue>();
+        playerAttackExecutor = player.GetComponent<AttackExecutor>();
     }
 }

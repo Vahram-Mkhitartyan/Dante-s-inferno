@@ -22,7 +22,13 @@ public class HostilityDirector : MonoBehaviour
     public float backstabPerSin = 0.01f;
 
     private readonly List<EnemyState> cached = new List<EnemyState>();
+    private bool usesFallbackSinSubscription;
 
+    void Awake()
+    {
+        if (FindAnyObjectByType<WorldReactionDirector>() == null)
+            gameObject.AddComponent<WorldReactionDirector>();
+    }
 
     void Start()
     {
@@ -34,24 +40,29 @@ public class HostilityDirector : MonoBehaviour
         CacheEnemies();
 
         AssignPotentialBackstabbers();        // 🔒 identity FIRST
-        ApplyHostilityFromCurrentSin(true);   // then hostility
-        AssignBackstabbers();                 // then activation
+        ApplyReaction(SinManager.Instance ? SinManager.Instance.Sin : 0, true);
 
-        if (SinManager.Instance != null)
+        usesFallbackSinSubscription = FindAnyObjectByType<WorldReactionDirector>() == null;
+        if (usesFallbackSinSubscription && SinManager.Instance != null)
             SinManager.Instance.OnSinChanged += OnSinChanged;
     }
 
 
     void OnDestroy()
     {
-        if (SinManager.Instance != null)
+        if (usesFallbackSinSubscription && SinManager.Instance != null)
             SinManager.Instance.OnSinChanged -= OnSinChanged;
     }
 
     void OnSinChanged(int newSin)
     {
-        ApplyHostilityFromCurrentSin(allowDehostile: false);
-        AssignBackstabbers();
+        ApplyReaction(newSin, allowDehostile: false);
+    }
+
+    public void ApplyReaction(float worldPressure, bool allowDehostile)
+    {
+        ApplyHostility(worldPressure, allowDehostile);
+        AssignBackstabbers(worldPressure);
     }
 
     // -----------------------------
@@ -118,14 +129,12 @@ public class HostilityDirector : MonoBehaviour
     // -----------------------------
     // HOSTILITY ASSIGNMENT
     // -----------------------------
-    void ApplyHostilityFromCurrentSin(bool allowDehostile)
+    void ApplyHostility(float worldPressure, bool allowDehostile)
     {
         RemoveDeadEnemies();
         if (cached.Count == 0) return;
 
-        int sin = SinManager.Instance ? SinManager.Instance.Sin : 0;
-
-        float finalRatio = Mathf.Clamp01(baseHostileRatio + sin * ratioPerSin);
+        float finalRatio = Mathf.Clamp01(baseHostileRatio + worldPressure * ratioPerSin);
         int targetHostile = Mathf.RoundToInt(cached.Count * finalRatio);
         targetHostile = Mathf.Clamp(
             targetHostile,
@@ -163,13 +172,12 @@ public class HostilityDirector : MonoBehaviour
     // -----------------------------
     // BACKSTABBER ASSIGNMENT
     // -----------------------------
-    void AssignBackstabbers()
+    void AssignBackstabbers(float worldPressure)
     {
         RemoveDeadEnemies();
         if (cached.Count == 0) return;
 
-        int sin = SinManager.Instance ? SinManager.Instance.Sin : 0;
-        float finalRatio = Mathf.Clamp01(baseBackstabRatio + sin * backstabPerSin);
+        float finalRatio = Mathf.Clamp01(baseBackstabRatio + worldPressure * backstabPerSin);
 
         List<Backstabber> potentials = new List<Backstabber>();
         foreach (var e in cached)

@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private Collider2D col;
     private KnockbackReceiver knockback;
+    private KnockbackReceiverNew knockbackNew;
     private Transform gfx;
     private PlayerSpineAnimationController spineAnim;
 
@@ -37,6 +38,9 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         knockback = GetComponent<KnockbackReceiver>();
+        knockbackNew = GetComponent<KnockbackReceiverNew>();
+        if (knockbackNew == null)
+            knockbackNew = gameObject.AddComponent<KnockbackReceiverNew>();
 
         rb.gravityScale = 0;
         rb.freezeRotation = true;
@@ -55,7 +59,8 @@ public class PlayerController : MonoBehaviour
         // 🔒 HARD LOCK (attacks / hurt / death)
         if (isLocked || (spineAnim && spineAnim.IsLocked()))
         {
-            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            if (!IsBeingKnockedBack())
+                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
             return;
         }
 
@@ -94,7 +99,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (knockback && knockback.IsKnockedBack)
+        if (IsBeingKnockedBack())
             return;
 
         // Gravity
@@ -109,5 +114,10 @@ public class PlayerController : MonoBehaviour
             0.05f,
             groundLayer
         );
+    }
+
+    bool IsBeingKnockedBack()
+    {
+        return (knockback && knockback.IsKnockedBack) || (knockbackNew && knockbackNew.IsKnockedBack);
     }
 }

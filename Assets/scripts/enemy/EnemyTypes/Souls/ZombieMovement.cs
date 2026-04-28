@@ -11,6 +11,8 @@ public class ZombieMovement : MonoBehaviour, IEnemyMovement
     {
         rb = GetComponent<Rigidbody2D>();
         knockback = GetComponent<KnockbackReceiverNew>();
+        if (knockback == null)
+            knockback = gameObject.AddComponent<KnockbackReceiverNew>();
     }
 
     public void TickMovement(Transform target)

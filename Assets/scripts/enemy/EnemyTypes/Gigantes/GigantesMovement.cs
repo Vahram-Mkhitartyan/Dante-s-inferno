@@ -7,16 +7,21 @@ public class GigantesMovement : MonoBehaviour, IEnemyMovement
 
     private GigantesAttack attack;
     private Rigidbody2D rb;
+    private KnockbackReceiverNew knockback;
 
     void Awake()
     {
         attack = GetComponent<GigantesAttack>();
         rb = GetComponent<Rigidbody2D>();
+        knockback = GetComponent<KnockbackReceiverNew>();
+        if (knockback == null)
+            knockback = gameObject.AddComponent<KnockbackReceiverNew>();
     }
 
     public void TickMovement(Transform target)
     {
         if (target == null) return;
+        if (knockback != null && knockback.IsKnockedBack) return;
 
         // Pause movement while the attack windup/impact is active.
         if (attack != null && attack.IsCommitted)
@@ -32,7 +37,7 @@ public class GigantesMovement : MonoBehaviour, IEnemyMovement
 
     void Move(Vector2 delta)
     {
-        if (rb == null || rb.bodyType == RigidbodyType2D.Static || rb.constraints != RigidbodyConstraints2D.None)
+        if (rb == null || rb.bodyType == RigidbodyType2D.Static)
         {
             transform.position += (Vector3)delta;
             return;

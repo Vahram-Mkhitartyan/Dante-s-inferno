@@ -4,8 +4,8 @@ using System.Collections;
 public class KnockbackReceiverNew : MonoBehaviour
 {
     [Header("Tuning")]
-    public float coefficient = 1f;
-    public float duration = 0.15f;
+    public float coefficient = 1.15f;
+    public float duration = 0.22f;
     public bool clearVelocity = true;
     public bool ignoreWhenDefending = true;
 

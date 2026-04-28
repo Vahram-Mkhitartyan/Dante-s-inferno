@@ -48,6 +48,7 @@ public class Health : MonoBehaviour
             if (dot > 0f)
             {
                 OnBlocked?.Invoke();
+                PlayerActionEvents.RaiseDamageBlocked();
                 return;
             }
         }
@@ -57,11 +58,17 @@ public class Health : MonoBehaviour
 
         if (currentHealth > 0)
         {
+            if (pc != null)
+                PlayerActionEvents.RaiseDamageTaken();
+
             OnDamaged?.Invoke();
         }
         else
         {
             isDying = true;
+            if (pc != null)
+                PlayerActionEvents.RaisePlayerDied();
+
             OnDeath?.Invoke();
             if (destroyOnDeath)
                 Destroy(gameObject, destroyDelay);

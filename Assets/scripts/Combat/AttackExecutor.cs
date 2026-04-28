@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -18,35 +19,41 @@ public class AttackExecutor : MonoBehaviour
     public Transform hitOrigin;
     public LayerMask enemyLayer;
 
-    [Header("Sword")]
-    public float swordRange = 1.2f;
-    public int swordDamage = 1;
-    public float swordKnockbackForce = 6f;
-    public float swordHitDelay = 0.15f;
+    [Header("J - Top-Down Swing")]
+    [FormerlySerializedAs("swordRange")] public float topDownRange = 1.15f;
+    [FormerlySerializedAs("swordDamage")] public int topDownDamage = 1;
+    [FormerlySerializedAs("swordKnockbackForce")] public float topDownKnockbackForce = 5.5f;
+    public float topDownVerticalForce = -0.2f;
+    [FormerlySerializedAs("swordHitDelay")] public float topDownHitDelay = 0.14f;
 
-    [Header("Kick")]
-    public int kickDamage = 1;
-    public float kickKnockbackForce = 8f;
-    public float kickVerticalLift = 0.3f;
-    public float kickHitDelay = 0.18f;
+    [Header("K - Upward Launcher")]
+    [FormerlySerializedAs("kickDamage")] public int upwardDamage = 1;
+    [FormerlySerializedAs("kickKnockbackForce")] public float upwardKnockbackForce = 6.5f;
+    [FormerlySerializedAs("kickVerticalLift")] public float upwardLift = 1.35f;
+    [FormerlySerializedAs("kickHitDelay")] public float upwardHitDelay = 0.18f;
 
-
-    [Header("Spin")]
-    public float spinRadius = 1.5f;
-    public int spinDamage = 2;
-    public float spinKnockbackForce = 5f;
-    public float spinHitDelay = 0.2f;
+    [Header("L - Forward Pierce")]
+    [FormerlySerializedAs("spinRadius")] public float pierceRange = 1.6f;
+    public float pierceRadius = 0.45f;
+    [FormerlySerializedAs("spinDamage")] public int pierceDamage = 2;
+    [FormerlySerializedAs("spinKnockbackForce")] public float pierceKnockbackForce = 9f;
+    public float pierceLift = 0.05f;
+    [FormerlySerializedAs("spinHitDelay")] public float pierceHitDelay = 0.12f;
 
     //initialize queue to store attack types
     [SerializeField] private PlayerSpineAnimationController animControl;
     private readonly Queue<AttackType> queued = new Queue<AttackType>();
     private Coroutine hitDelayRoutine;
     private ComboQueue combo;
+    private PlayerBehaviorTracker behavior;
 
     void Awake()
     {
         EnsureEnemyLayer();
         combo = GetComponent<ComboQueue>();
+        behavior = GetComponent<PlayerBehaviorTracker>();
+        if (behavior == null)
+            behavior = gameObject.AddComponent<PlayerBehaviorTracker>();
     }
 
 #if UNITY_EDITOR
@@ -85,30 +92,33 @@ public class AttackExecutor : MonoBehaviour
 
     void ExecuteNow(AttackType attack)
     {
+        behavior?.RecordAttack(attack);
+        PlayerActionEvents.RaiseAttackStarted(attack);
+
         switch (attack)
         {
-            case AttackType.Sword:
-                Sword();
+            case AttackType.TopDownSwing:
+                TopDownSwing();
                 break;
-            case AttackType.KickLauncher:
-                Kick();
+            case AttackType.UpwardLauncher:
+                UpwardLauncher();
                 break;
-            case AttackType.Spin360:
-                Spin();
+            case AttackType.ForwardPierce:
+                ForwardPierce();
                 break;
         }
     }
 
-    void Sword()
+    void TopDownSwing()
     {
         animControl.RequestAttack("Attack1", 0.6f);
-        StartCoroutine(SwordHitRoutine());
+        StartCoroutine(TopDownHitRoutine());
     }
 
-    void Kick()
+    void UpwardLauncher()
     {
         animControl.RequestAttack("Buff", 0.6f);
-        StartCoroutine(KickHitRoutine());
+        StartCoroutine(UpwardHitRoutine());
     }
 
     float GetFacingDirection()
@@ -119,29 +129,30 @@ public class AttackExecutor : MonoBehaviour
 
 
 
-    void Spin()
+    void ForwardPierce()
     {
         animControl.RequestAttack("Attack2", 0.6f);
-        StartCoroutine(SpinHitRoutine());
+        StartCoroutine(PierceHitRoutine());
     }
 
-    IEnumerator SwordHitRoutine()
+    IEnumerator TopDownHitRoutine()
     {
-        float delay = swordHitDelay * hitDelayMultiplier;
+        float delay = topDownHitDelay * hitDelayMultiplier;
         if (delay > 0f)
             yield return new WaitForSeconds(delay);
 
         Collider2D hit = Physics2D.OverlapCircle(
-            hitOrigin.position, swordRange, enemyLayer);
+            GetConfiguredHitOrigin(), topDownRange, enemyLayer);
 
         if (!hit) yield break;
         RegisterCombo('A');
-        Apply(hit, swordDamage, Direction(hit) * swordKnockbackForce);
+        Vector2 forceDir = (Direction(hit) + Vector2.up * topDownVerticalForce).normalized;
+        Apply(hit, topDownDamage, forceDir * topDownKnockbackForce, AttackType.TopDownSwing);
     }
 
-    IEnumerator KickHitRoutine()
+    IEnumerator UpwardHitRoutine()
     {
-        float delay = kickHitDelay * hitDelayMultiplier;
+        float delay = upwardHitDelay * hitDelayMultiplier;
         if (delay > 0f)
             yield return new WaitForSeconds(delay);
 
@@ -155,31 +166,34 @@ public class AttackExecutor : MonoBehaviour
 
         RegisterCombo('B');
         Vector2 dir = Direction(hit);
-        Vector2 forceDir = (dir + Vector2.up * kickVerticalLift).normalized;
-        Vector2 force = forceDir * kickKnockbackForce;
+        Vector2 forceDir = (dir + Vector2.up * upwardLift).normalized;
+        Vector2 force = forceDir * upwardKnockbackForce;
 
-        Apply(hit, kickDamage, force);
+        Apply(hit, upwardDamage, force, AttackType.UpwardLauncher);
     }
 
-    IEnumerator SpinHitRoutine()
+    IEnumerator PierceHitRoutine()
     {
-        float delay = spinHitDelay * hitDelayMultiplier;
+        float delay = pierceHitDelay * hitDelayMultiplier;
         if (delay > 0f)
             yield return new WaitForSeconds(delay);
 
         Collider2D[] hits = Physics2D.OverlapCircleAll(
-            transform.position, spinRadius, enemyLayer);
+            GetPierceOrigin(), pierceRadius, enemyLayer);
 
         if (hits.Length > 0)
             RegisterCombo('C');
 
+        Vector2 forceDir = new Vector2(GetFacingDirection(), pierceLift).normalized;
         foreach (var h in hits)
-            Apply(h, spinDamage, Direction(h) * spinKnockbackForce);
+            Apply(h, pierceDamage, forceDir * pierceKnockbackForce, AttackType.ForwardPierce);
     }
 
-    void Apply(Collider2D target, int dmg, Vector2 force)
+    void Apply(Collider2D target, int dmg, Vector2 force, AttackType attack)
     {
-        HitResolver.ApplyHit(target.gameObject, dmg, force, transform.position);
+        int scaledDamage = PlayerActionEvents.ModifyOutgoingDamage(dmg);
+        HitResolver.ApplyHit(target.gameObject, scaledDamage, force, transform.position);
+        PlayerActionEvents.RaiseAttackHit(attack);
     }
 
     void RegisterCombo(char input)
@@ -191,6 +205,17 @@ public class AttackExecutor : MonoBehaviour
     {
         float dir = GetFacingDirection();
         return (Vector2)transform.position + new Vector2(dir * hitOffset.x, hitOffset.y);
+    }
+
+    Vector2 GetConfiguredHitOrigin()
+    {
+        return hitOrigin != null ? hitOrigin.position : GetHitOrigin();
+    }
+
+    Vector2 GetPierceOrigin()
+    {
+        float dir = GetFacingDirection();
+        return (Vector2)transform.position + new Vector2(dir * pierceRange, hitOffset.y);
     }
 
     Vector2 Direction(Collider2D t)

@@ -18,9 +18,11 @@ public class CameraFollow : MonoBehaviour
 
     private Vector3 velocity;
     private Transform lastTarget;
+    private Coroutine moveRoutine;
 
     void LateUpdate()
     {
+        if (moveRoutine != null) return;
         if (!target) return;
 
         // Reset inertia if target changes (prevents oscillation buildup)
@@ -51,5 +53,46 @@ public class CameraFollow : MonoBehaviour
             ref velocity,
             followSmoothTime
         );
+    }
+
+    public void MoveToTargetFraming(Vector3 targetPosition, float duration)
+    {
+        Vector3 desired = GetDesiredPosition(targetPosition);
+
+        if (moveRoutine != null)
+            StopCoroutine(moveRoutine);
+
+        moveRoutine = StartCoroutine(MoveToRoutine(desired, duration));
+    }
+
+    Vector3 GetDesiredPosition(Vector3 targetPosition)
+    {
+        return new Vector3(
+            targetPosition.x + screenOffset.x,
+            targetPosition.y + screenOffset.y,
+            -10f
+        );
+    }
+
+    System.Collections.IEnumerator MoveToRoutine(Vector3 destination, float duration)
+    {
+        velocity = Vector3.zero;
+
+        Vector3 start = transform.position;
+        float distance = Vector3.Distance(start, destination);
+        float travelDuration = Mathf.Max(0.05f, duration);
+        float speed = distance / travelDuration;
+        float traveled = 0f;
+
+        while (traveled < distance)
+        {
+            float step = speed * Time.deltaTime;
+            transform.position = Vector3.MoveTowards(transform.position, destination, step);
+            traveled += step;
+            yield return null;
+        }
+
+        transform.position = destination;
+        moveRoutine = null;
     }
 }

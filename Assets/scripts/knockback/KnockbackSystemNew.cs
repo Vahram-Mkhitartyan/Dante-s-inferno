@@ -7,7 +7,14 @@ public static class KnockbackSystemNew
         if (target == null) return false;
 
         KnockbackReceiverNew receiver = target.GetComponentInParent<KnockbackReceiverNew>();
-        if (receiver == null) return false;
+        if (receiver == null)
+        {
+            KnockbackReceiver legacyReceiver = target.GetComponentInParent<KnockbackReceiver>();
+            if (legacyReceiver == null) return false;
+
+            legacyReceiver.ApplyKnockback(direction.normalized * baseForce);
+            return true;
+        }
 
         receiver.Apply(direction, baseForce);
         return true;
