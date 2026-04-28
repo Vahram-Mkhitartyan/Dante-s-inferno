@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class AttackExecutor : MonoBehaviour
 {
+    //enemy layer
     private static readonly string[] EnemyLayerNames = { "enemy", "Enemy" };
 
     [Header("Queue")]
@@ -20,22 +21,23 @@ public class AttackExecutor : MonoBehaviour
     [Header("Sword")]
     public float swordRange = 1.2f;
     public int swordDamage = 1;
-    public float swordKnockback = 4f;
+    public float swordKnockbackForce = 6f;
     public float swordHitDelay = 0.15f;
 
     [Header("Kick")]
     public int kickDamage = 1;
-    public float kickHorizontalForce = 4f;
-    public float kickVerticalForce = 8f;
+    public float kickKnockbackForce = 8f;
+    public float kickVerticalLift = 0.3f;
     public float kickHitDelay = 0.18f;
 
 
     [Header("Spin")]
     public float spinRadius = 1.5f;
     public int spinDamage = 2;
+    public float spinKnockbackForce = 5f;
     public float spinHitDelay = 0.2f;
 
-
+    //initialize queue to store attack types
     [SerializeField] private PlayerSpineAnimationController animControl;
     private readonly Queue<AttackType> queued = new Queue<AttackType>();
     private Coroutine hitDelayRoutine;
@@ -134,7 +136,7 @@ public class AttackExecutor : MonoBehaviour
 
         if (!hit) yield break;
         RegisterCombo('A');
-        Apply(hit, swordDamage, Direction(hit) * swordKnockback);
+        Apply(hit, swordDamage, Direction(hit) * swordKnockbackForce);
     }
 
     IEnumerator KickHitRoutine()
@@ -152,8 +154,9 @@ public class AttackExecutor : MonoBehaviour
         if (!hit) yield break;
 
         RegisterCombo('B');
-        float dir = GetFacingDirection();
-        Vector2 force = new Vector2(dir * kickHorizontalForce, kickVerticalForce);
+        Vector2 dir = Direction(hit);
+        Vector2 forceDir = (dir + Vector2.up * kickVerticalLift).normalized;
+        Vector2 force = forceDir * kickKnockbackForce;
 
         Apply(hit, kickDamage, force);
     }
@@ -171,7 +174,7 @@ public class AttackExecutor : MonoBehaviour
             RegisterCombo('C');
 
         foreach (var h in hits)
-            Apply(h, spinDamage, Direction(h) * 5f);
+            Apply(h, spinDamage, Direction(h) * spinKnockbackForce);
     }
 
     void Apply(Collider2D target, int dmg, Vector2 force)

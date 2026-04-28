@@ -5,6 +5,7 @@ public class GigantesAttack : MonoBehaviour, IEnemyAttack
 {
     public int damage = 3;
     public float range = 1.7f;
+    public float knockbackForce = 6f;
 
     [Header("Timing")]
     public float windupTime = 0.6f;
@@ -59,7 +60,7 @@ public class GigantesAttack : MonoBehaviour, IEnemyAttack
         HitResolver.ApplyHit(
             player.gameObject,
             damage,
-            dir,
+            dir * knockbackForce,
             transform.position
         );
 

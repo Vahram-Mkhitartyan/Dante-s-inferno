@@ -5,15 +5,20 @@ public class ZombieMovement : MonoBehaviour, IEnemyMovement
     public float moveSpeed = 1.2f;
 
     private Rigidbody2D rb;
+    private KnockbackReceiverNew knockback;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        knockback = GetComponent<KnockbackReceiverNew>();
     }
 
     public void TickMovement(Transform target)
     {
         if (rb == null || target == null)
+            return;
+
+        if (knockback != null && knockback.IsKnockedBack)
             return;
 
         Vector2 dir = (target.position - transform.position).normalized;

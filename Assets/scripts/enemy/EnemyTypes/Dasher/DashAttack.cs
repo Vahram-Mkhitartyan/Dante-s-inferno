@@ -3,6 +3,7 @@ public class DashAttack : MonoBehaviour, IEnemyAttack
 {
     public int damage = 2;
     public float hitCooldown = 0.25f;
+    public float knockbackForce = 4f;
 
     private float lastHit;
     private EnemyState state;
@@ -24,7 +25,7 @@ public class DashAttack : MonoBehaviour, IEnemyAttack
         HitResolver.ApplyHit(
             target.gameObject,
             damage,
-            dir,
+            dir * knockbackForce,
             transform.position
         );
 

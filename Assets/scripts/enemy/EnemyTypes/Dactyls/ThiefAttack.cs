@@ -7,6 +7,7 @@ public class ThiefAttack : MonoBehaviour, IEnemyAttack
     public int damage = 1;
     public float range = 1.2f;
     public float cooldown = 1.8f;
+    public float knockbackForce = 3.5f;
 
     [Header("Steal")]
     [Range(0f, 1f)]
@@ -103,7 +104,7 @@ public class ThiefAttack : MonoBehaviour, IEnemyAttack
         HitResolver.ApplyHit(
             target.gameObject,
             damage,
-            dir,
+            dir * knockbackForce,
             transform.position
         );
 

@@ -10,14 +10,7 @@ public static class HitResolver
         Health hp = target.GetComponentInParent<Health>();
         if (hp) hp.TakeDamage(damage, attackerPosition);
 
-        KnockbackReceiver kb = target.GetComponentInParent<KnockbackReceiver>();
-        if (kb)
-        {
-            kb.ApplyKnockback(force, force.magnitude);
-            return;
-        }
-
-        Rigidbody2D rb = target.GetComponentInParent<Rigidbody2D>();
-        if (rb) rb.AddForce(force, ForceMode2D.Impulse);
+        if (force != Vector2.zero)
+            KnockbackSystemNew.Apply(target, force.normalized, force.magnitude);
     }
 }

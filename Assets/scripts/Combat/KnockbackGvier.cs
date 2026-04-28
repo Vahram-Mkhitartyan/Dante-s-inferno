@@ -12,7 +12,7 @@ public class KnockbackGiver : MonoBehaviour
 
     public void ApplyTo(GameObject target, int comboStep = 0)
     {
-        KnockbackReceiver receiver = target.GetComponent<KnockbackReceiver>();
+        KnockbackReceiverNew receiver = target.GetComponentInParent<KnockbackReceiverNew>();
         if (receiver == null) return;
 
         Vector2 direction = GetDirection(target.transform);
@@ -23,7 +23,7 @@ public class KnockbackGiver : MonoBehaviour
         if (verticalForce > 0f)
             finalForce += Vector2.up * verticalForce;
 
-        receiver.ApplyKnockback(finalForce.normalized, finalForce.magnitude);
+        KnockbackSystemNew.Apply(target, finalForce.normalized, finalForce.magnitude);
 
     }
 

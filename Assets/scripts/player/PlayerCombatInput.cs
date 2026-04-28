@@ -5,17 +5,12 @@ public class PlayerCombatInput : MonoBehaviour
     private ComboQueue combo;
     private AttackExecutor executor;
     private PlayerController player;
-    public bool debugLogs = true;
 
     void Awake()
     {
         combo = GetComponent<ComboQueue>();
         executor = GetComponent<AttackExecutor>();
         player = GetComponent<PlayerController>();
-
-        if (debugLogs)
-        {
-        }
     }
 
     void Update()
@@ -26,20 +21,15 @@ public class PlayerCombatInput : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.K))
             HandleInput('B');
 
-        if (Input.GetKeyDown(KeyCode.L) && player.IsGrounded)
+        if (Input.GetKeyDown(KeyCode.L) && player != null && player.IsGrounded)
             HandleInput('C');
     }
 
 
     void HandleInput(char input)
     {
-        if (debugLogs)
-
-        if (combo == null || executor == null)
-        {
-            if (debugLogs)
+        if (executor == null)
             return;
-        }
 
         switch (input)
         {
@@ -55,8 +45,6 @@ public class PlayerCombatInput : MonoBehaviour
                 executor.Execute(AttackType.Spin360);
                 break;
         }
-
-        if (debugLogs)
     }
 
 }

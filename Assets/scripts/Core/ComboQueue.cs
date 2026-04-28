@@ -5,7 +5,6 @@ public class ComboQueue : MonoBehaviour
 {
     public int maxSize = 8;
     public float resetTime = 0.8f;
-    public bool debugLogs = true;
 
     private readonly Queue<char> inputs = new Queue<char>();
     private float lastInputTime;
@@ -14,7 +13,6 @@ public class ComboQueue : MonoBehaviour
     {
         inputs.Clear();
         lastInputTime = 0f;
-        if (debugLogs)
     }
 
     public void Register(char input)
@@ -23,7 +21,6 @@ public class ComboQueue : MonoBehaviour
         if (Time.time - lastInputTime > resetTime)
         {
             inputs.Clear();
-            if (debugLogs)
         }
 
         lastInputTime = Time.time;
@@ -31,14 +28,11 @@ public class ComboQueue : MonoBehaviour
         inputs.Enqueue(input);
         while (inputs.Count > maxSize)
             inputs.Dequeue();
-
-        if (debugLogs)
     }
 
     public void Clear()
     {
         inputs.Clear();
-        if (debugLogs)
     }
 
     public string DebugString() => new string(inputs.ToArray());
