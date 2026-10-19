@@ -10,12 +10,23 @@ public class WhisperManager : MonoBehaviour
 
     Coroutine currentRoutine;
 
+    public bool IsWhispering => currentRoutine != null;
+
     public void Whisper(string message)
     {
         if (currentRoutine != null)
             StopCoroutine(currentRoutine);
 
         currentRoutine = StartCoroutine(ShowText(message));
+    }
+
+    public bool TryWhisper(string message)
+    {
+        if (IsWhispering)
+            return false;
+
+        Whisper(message);
+        return true;
     }
 
     IEnumerator ShowText(string message)
@@ -45,5 +56,6 @@ public class WhisperManager : MonoBehaviour
         }
 
         subtitleText.alpha = 0f;
+        currentRoutine = null;
     }
 }

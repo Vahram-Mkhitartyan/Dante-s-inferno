@@ -1,6 +1,6 @@
 # Sin System Integration Plan
 
-Status: Foundation integrated; Wrath connected; Greed contract validated
+Status: Foundation integrated; Wrath feedback playable; Greed contract validated
 
 ## Implementation Progress
 
@@ -16,9 +16,13 @@ Completed on October 19, 2026:
 - Data-driven Wrath evaluator connected to combat actions
 - Data-driven Greed evaluator and reusable temptation choice component
 - Snapshot-driven world pressure
-- Fifteen passing deterministic Edit Mode tests
+- Automatic scene-local Wrath lighting and camera-color response
+- Non-numerical Death hints on rising Wrath thresholds when dialogue is available
+- `F8` editor/development snapshot diagnostics
+- Spine track resynchronization after jumps and action locks
+- Twenty passing deterministic Edit Mode tests
 
-The next content task is to author a visible Greed temptation encounter. The next architecture migration is Reflection consuming snapshots directly.
+The next presentation task is to identify or author a real mirror target for snapshot-driven corruption. The next content task is a visible Greed temptation encounter, and the next architecture migration is Reflection consuming snapshots directly.
 
 ## Assessment
 

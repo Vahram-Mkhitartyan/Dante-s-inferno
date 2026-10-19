@@ -4,6 +4,26 @@ namespace DantesInferno.SinSystem.Tests
 {
     public class SinEvaluationTests
     {
+        [TestCase(0f, WrathFeedbackLevel.Quiet)]
+        [TestCase(0.2f, WrathFeedbackLevel.Stirring)]
+        [TestCase(0.5f, WrathFeedbackLevel.Surging)]
+        [TestCase(0.8f, WrathFeedbackLevel.Overwhelming)]
+        public void WrathFeedbackPolicy_UsesStableThresholds(
+            float pressure,
+            WrathFeedbackLevel expected)
+        {
+            Assert.That(WrathFeedbackPolicy.GetLevel(pressure), Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void WrathFeedbackPolicy_SubduesNonDominantWrath()
+        {
+            float dominant = WrathFeedbackPolicy.GetVisualIntensity(0.8f, true);
+            float secondary = WrathFeedbackPolicy.GetVisualIntensity(0.8f, false);
+
+            Assert.That(secondary, Is.LessThan(dominant));
+        }
+
         [Test]
         public void RepeatedAttacksCreateMoreWrathPressureThanDeliberateAttacks()
         {

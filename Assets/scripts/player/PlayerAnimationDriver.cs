@@ -32,7 +32,7 @@ public class PlayerAnimationDriver
             nextAnim = PlayerAnimations.Idle;
         }
 
-        if (currentAnim == nextAnim) return;
+        if (currentAnim == nextAnim && animator.IsPlaying(nextAnim)) return;
         currentAnim = nextAnim;
 
         animator.ChangeAnimation(nextAnim.ToString());

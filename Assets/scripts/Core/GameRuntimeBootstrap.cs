@@ -26,5 +26,11 @@ public static class GameRuntimeBootstrap
 
         if (SinManager.Instance == null)
             new GameObject(nameof(SinManager)).AddComponent<SinManager>();
+
+        if (Object.FindAnyObjectByType<SinDebugOverlay>() == null)
+            new GameObject(nameof(SinDebugOverlay)).AddComponent<SinDebugOverlay>();
+
+        if (Object.FindAnyObjectByType<WrathWorldFeedbackDirector>() == null)
+            new GameObject(nameof(WrathWorldFeedbackDirector)).AddComponent<WrathWorldFeedbackDirector>();
     }
 }

@@ -167,6 +167,21 @@ public class CharacterAnimator : MonoBehaviour
         AnimationManager();
     }
 
+    public bool IsPlaying(PlayerAnimations animation)
+    {
+        if (characterSkeleton == null || AccGE == null)
+            return false;
+
+        if (!JobsAnimations.TryGetValue(AccGE.Job, out Dictionary<PlayerAnimations, string> animations)
+            || !animations.TryGetValue(animation, out string animationName))
+            return false;
+
+        TrackEntry current = characterSkeleton.AnimationState.GetCurrent(0);
+        return current != null
+            && current.Animation != null
+            && string.Equals(current.Animation.Name, animationName, StringComparison.Ordinal);
+    }
+
     //Runs the required animation using SetAnimation spine function
     void AnimationManager()
     {

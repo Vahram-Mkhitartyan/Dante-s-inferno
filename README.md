@@ -11,6 +11,8 @@ The current update integrates the seven-axis sin architecture with the playable 
 - Wrath reacts to deliberate attacks, repetition, blocking, damage, and unnecessary kills.
 - Greed uses the same contracts for collecting, rejecting, and investing temptation rewards.
 - Existing momentum, power, hostility, and Reflection behavior remains available through a compatibility layer.
+- Wrath pressure now produces gradual scene tinting and threshold-based Death hints.
+- `F8` opens a development-only live view of all seven sin axes and the latest action.
 
 ## Core Mechanics
 
@@ -71,6 +73,7 @@ The player now respawns instead of being destroyed on death. Respawn includes:
 - `J` - Top-down swing
 - `K` - Upward launcher
 - `L` - Forward pierce
+- `F8` - Toggle sin diagnostics in the Editor or a development build
 
 ## Project Setup
 
@@ -108,6 +111,9 @@ Current foundation work includes:
 - data-driven Wrath and Greed evaluators
 - snapshot-driven world pressure with legacy compatibility
 - versioned save/load support and deterministic RNG restoration
+- automatic visible Wrath feedback for scene lighting and camera color
+- non-numerical threshold whispers through an available `WhisperManager`
+- animation-track resynchronization after jumping or action overrides
 - an Edit Mode test command at `Tools > Dante's Inferno > Run Sin System Tests`
 
 ## Development Status

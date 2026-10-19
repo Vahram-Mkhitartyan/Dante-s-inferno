@@ -15,7 +15,7 @@ The project has a functioning vertical slice, but several systems still contain 
 - Character animation: Spine and Fantazia Character Editor
 - Water: Modern Water 2D
 - Main branch: `main`
-- Current committed milestone: `V.0.2.2`
+- Current committed milestone: `V.0.2.3`
 
 The Unity Editor currently compiles the project successfully.
 
@@ -78,6 +78,8 @@ Player actions now produce contextual records with run-scoped event identities. 
 
 Versioned save data preserves all axes, deterministic seed progress, processed events, collapse history, Death corruption, companion choice, and resolved Greed temptations. Wrath is connected to current combat; Greed has a reusable temptation choice component and evaluator contract but still needs authored scene content and presentation.
 
+The first visible Wrath feedback slice is now active in every scene. Wrath pressure gradually tints global 2D lighting and the camera background, and escalating thresholds can produce non-numerical Death whispers when the scene's whisper channel is free. An editor/development diagnostics panel toggled with `F8` exposes the current snapshot and latest contextual action without becoming player-facing UI.
+
 ## Strong Foundations
 
 - Event-driven connection between combat and sin state
@@ -87,14 +89,14 @@ Versioned save data preserves all axes, deterministic seed progress, processed e
 - Direct-scene runtime bootstrap and isolated persistent services
 - Versioned save schema and rules versioning
 - Contextual action evaluation with duplicate protection
-- Fifteen deterministic Edit Mode tests
+- Twenty deterministic Edit Mode tests
 - Data-oriented direction through `SinDefinition`
 - Separate world-reaction layer
 - Respawn flow rather than destroying the player permanently
 
 ## Known Technical Debt
 
-- Locomotion and action animations are controlled by two different animation components.
+- Locomotion and action animations are controlled by two different animation components. Runtime track synchronization now prevents completed actions or jumps from leaving movement animation stale, but ownership is still split.
 - Legacy and replacement knockback components coexist.
 - Gameplay uses hardcoded legacy input even though Unity Input System is installed.
 - Tutorial tracking duplicates gameplay key checks.
@@ -105,10 +107,11 @@ Versioned save data preserves all axes, deterministic seed progress, processed e
 
 ## Immediate Priorities
 
-1. Author a visible Greed temptation encounter using `GreedTemptation`.
-2. Move Reflection from the scalar API to authoritative snapshots.
-3. Add qualified encounter weighting and mastery evidence limits.
-4. Consolidate player animation ownership.
-5. Complete migration to one knockback system.
-6. Introduce an input abstraction based on Unity Input System.
-7. Define the intended order and transition rules for all scenes.
+1. Identify or author the first mirror object and connect it to snapshot-driven corruption visuals.
+2. Author a visible Greed temptation encounter using `GreedTemptation`.
+3. Move Reflection from the scalar API to authoritative snapshots.
+4. Add qualified encounter weighting and mastery evidence limits.
+5. Consolidate player animation ownership.
+6. Complete migration to one knockback system.
+7. Introduce an input abstraction based on Unity Input System.
+8. Define the intended order and transition rules for all scenes.
