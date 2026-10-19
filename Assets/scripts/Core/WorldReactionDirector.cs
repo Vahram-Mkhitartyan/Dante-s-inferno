@@ -1,4 +1,5 @@
 using UnityEngine;
+using DantesInferno.SinSystem;
 
 public class WorldReactionDirector : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class WorldReactionDirector : MonoBehaviour
     public float overcommitPressure = 3f;
     public float collapsePressure = 8f;
 
+    private SinManager boundSinManager;
+    private PlayerBehaviorTracker boundBehavior;
+
     void Awake()
     {
         if (hostility == null)
@@ -22,24 +26,17 @@ public class WorldReactionDirector : MonoBehaviour
 
     void OnEnable()
     {
-        if (SinManager.Instance != null)
-            SinManager.Instance.OnSinProfileChanged += OnSinProfileChanged;
-
-        if (behavior != null)
-            behavior.OnPatternChanged += OnPatternChanged;
+        BindDependencies();
     }
 
     void OnDisable()
     {
-        if (SinManager.Instance != null)
-            SinManager.Instance.OnSinProfileChanged -= OnSinProfileChanged;
-
-        if (behavior != null)
-            behavior.OnPatternChanged -= OnPatternChanged;
+        UnbindDependencies();
     }
 
     void Start()
     {
+        BindDependencies();
         ApplyCurrentReaction(allowDehostile: true);
     }
 
@@ -53,12 +50,19 @@ public class WorldReactionDirector : MonoBehaviour
         ApplyCurrentReaction(allowDehostile: false);
     }
 
+    void OnSnapshotChanged(SinStateSnapshot snapshot)
+    {
+        ApplyCurrentReaction(allowDehostile: false);
+    }
+
     void ApplyCurrentReaction(bool allowDehostile)
     {
         if (hostility == null || SinManager.Instance == null)
             return;
 
-        float pressure = SinManager.Instance.Sin;
+        float pressure = SinManager.Instance.CurrentSnapshot != null
+            ? SinManager.Instance.CurrentSnapshot.OverallPressure * 100f
+            : SinManager.Instance.Sin;
         pressure += GetBehaviorPressure();
 
         if (SinManager.Instance.State == SinState.Collapse)
@@ -82,6 +86,55 @@ public class WorldReactionDirector : MonoBehaviour
                 return overcommitPressure;
             default:
                 return 0f;
+        }
+    }
+
+    void BindDependencies()
+    {
+        SinManager currentSinManager = SinManager.Instance;
+        if (boundSinManager != currentSinManager)
+        {
+            if (boundSinManager != null)
+            {
+                boundSinManager.OnSinProfileChanged -= OnSinProfileChanged;
+                boundSinManager.OnSnapshotChanged -= OnSnapshotChanged;
+            }
+
+            boundSinManager = currentSinManager;
+            if (boundSinManager != null)
+            {
+                boundSinManager.OnSinProfileChanged += OnSinProfileChanged;
+                boundSinManager.OnSnapshotChanged += OnSnapshotChanged;
+            }
+        }
+
+        PlayerBehaviorTracker currentBehavior = behavior != null
+            ? behavior
+            : PlayerBehaviorTracker.Instance;
+        if (boundBehavior == currentBehavior)
+            return;
+
+        if (boundBehavior != null)
+            boundBehavior.OnPatternChanged -= OnPatternChanged;
+
+        boundBehavior = currentBehavior;
+        if (boundBehavior != null)
+            boundBehavior.OnPatternChanged += OnPatternChanged;
+    }
+
+    void UnbindDependencies()
+    {
+        if (boundSinManager != null)
+        {
+            boundSinManager.OnSinProfileChanged -= OnSinProfileChanged;
+            boundSinManager.OnSnapshotChanged -= OnSnapshotChanged;
+            boundSinManager = null;
+        }
+
+        if (boundBehavior != null)
+        {
+            boundBehavior.OnPatternChanged -= OnPatternChanged;
+            boundBehavior = null;
         }
     }
 }

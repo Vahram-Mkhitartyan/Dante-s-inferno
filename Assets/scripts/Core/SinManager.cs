@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using DantesInferno.SinSystem;
 using UnityEngine;
 
 public enum DominantSin
@@ -20,9 +22,15 @@ public enum SinState
     Collapse
 }
 
+[DefaultExecutionOrder(-1000)]
 public class SinManager : MonoBehaviour
 {
     public static SinManager Instance { get; private set; }
+
+    public static void ResetRuntimeState()
+    {
+        Instance = null;
+    }
 
     [Header("Run Identity")]
     public DominantSin dominantSin = DominantSin.Wrath;
@@ -53,6 +61,10 @@ public class SinManager : MonoBehaviour
     [Range(0f, 1f)] public float pureFormMomentumThreshold = 0.75f;
     [Range(0f, 1f)] public float pureFormStabilityThreshold = 0.70f;
 
+    [Header("Long-Term Run State")]
+    [Range(0f, 1f)] [SerializeField] private float deathCorruption;
+    [SerializeField] private DeathCompanionChoice companionChoice;
+
     public int Sin { get; private set; } = 1;
     public float Momentum => momentum;
     public float Stability => stability;
@@ -60,12 +72,20 @@ public class SinManager : MonoBehaviour
     public int CollapseCount { get; private set; }
     public bool IsPureForm { get; private set; }
     public float PowerMultiplier => 1f + GetMomentumRatio() * GetMaxPowerBonus();
+    public float DeathCorruption => deathCorruption;
+    public DeathCompanionChoice CompanionChoice => companionChoice;
+    public SinStateSnapshot CurrentSnapshot { get; private set; }
 
     public event Action<int> OnSinChanged; // passes new Sin value
     public event Action<SinManager> OnSinProfileChanged;
+    public event Action<SinStateSnapshot> OnSnapshotChanged;
 
     private float lastSinActionTime;
     private float lastCollapseTime = -999f;
+    private SinStateModel stateModel;
+    private readonly List<ISinActionEvaluator> evaluators = new List<ISinActionEvaluator>();
+    private readonly HashSet<SinEventId> processedEventIds = new HashSet<SinEventId>();
+    private readonly HashSet<string> resolvedTemptationIds = new HashSet<string>(StringComparer.Ordinal);
 
     void Awake()
     {
@@ -75,7 +95,8 @@ public class SinManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(transform.root.gameObject);
+        PersistentServiceLifecycle.PersistIndependently(this);
+        InitializeStateModel(LegacySinCompatibilityAdapter.ToSinType(dominantSin));
         RecalculateState();
     }
 
@@ -87,6 +108,7 @@ public class SinManager : MonoBehaviour
         PlayerActionEvents.OnDamageTaken += HandleDamageTaken;
         PlayerActionEvents.OnPlayerDied += HandlePlayerDied;
         PlayerActionEvents.OnNonHostileEnemyKilled += HandleNonHostileEnemyKilled;
+        PlayerActionEvents.OnActionRecorded += HandleActionRecorded;
         PlayerActionEvents.OnModifyOutgoingDamage += ScaleDamage;
     }
 
@@ -98,7 +120,14 @@ public class SinManager : MonoBehaviour
         PlayerActionEvents.OnDamageTaken -= HandleDamageTaken;
         PlayerActionEvents.OnPlayerDied -= HandlePlayerDied;
         PlayerActionEvents.OnNonHostileEnemyKilled -= HandleNonHostileEnemyKilled;
+        PlayerActionEvents.OnActionRecorded -= HandleActionRecorded;
         PlayerActionEvents.OnModifyOutgoingDamage -= ScaleDamage;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     void Update()
@@ -110,6 +139,17 @@ public class SinManager : MonoBehaviour
             SetStability(stability + deliberatePauseRecovery * Time.deltaTime);
 
         RecalculateState();
+
+        if (stateModel != null)
+        {
+            SinType previousDominant = stateModel.CurrentDominantSin;
+            stateModel.AdvanceDominance(Time.deltaTime);
+            if (stateModel.CurrentDominantSin != previousDominant)
+            {
+                dominantSin = LegacySinCompatibilityAdapter.ToDominantSin(stateModel.CurrentDominantSin);
+                PublishSnapshot();
+            }
+        }
     }
 
     void HandleAttackStarted(AttackType attack)
@@ -156,6 +196,26 @@ public class SinManager : MonoBehaviour
     void HandleNonHostileEnemyKilled()
     {
         AddMomentum(GetNonHostileKillMomentum());
+    }
+
+    void HandleActionRecorded(SinActionRecord action)
+    {
+        if (action == null || !processedEventIds.Add(action.EventId))
+            return;
+
+        if (IsGreedChoice(action.Kind)
+            && !string.IsNullOrWhiteSpace(action.EncounterId)
+            && !resolvedTemptationIds.Add(action.EncounterId))
+            return;
+
+        SinStateSnapshot snapshot = stateModel.CreateSnapshot();
+        for (int index = 0; index < evaluators.Count; index++)
+        {
+            if (evaluators[index].TryEvaluate(action, snapshot, out SinEvaluationDelta delta))
+                stateModel.Apply(delta);
+        }
+
+        PublishSnapshot();
     }
 
     public int ScaleDamage(int baseDamage)
@@ -218,6 +278,8 @@ public class SinManager : MonoBehaviour
             State = nextState;
             OnSinProfileChanged?.Invoke(this);
         }
+
+        SynchronizeCompatibilityPressure();
     }
 
     void Collapse()
@@ -306,5 +368,142 @@ public class SinManager : MonoBehaviour
     float GetMomentumRatio()
     {
         return maxMomentum <= 0f ? 0f : Mathf.Clamp01(momentum / maxMomentum);
+    }
+
+    public SinRunSaveData CaptureSaveData()
+    {
+        EnsureStateModel();
+
+        int currentSeed = SeedManager.Instance != null ? SeedManager.Instance.seed : 0;
+        long drawCount = SeedManager.Instance != null ? SeedManager.Instance.DrawCount : 0;
+        var processed = new SinEventId[processedEventIds.Count];
+        processedEventIds.CopyTo(processed);
+        Array.Sort(processed, CompareEventIds);
+        var resolvedTemptations = new string[resolvedTemptationIds.Count];
+        resolvedTemptationIds.CopyTo(resolvedTemptations);
+        Array.Sort(resolvedTemptations, StringComparer.Ordinal);
+
+        return new SinRunSaveData(
+            PlayerActionEvents.RunId,
+            PlayerActionEvents.NextSequence,
+            stateModel.OriginSin,
+            stateModel.CurrentDominantSin,
+            stateModel.CreateSaveAxes(),
+            CollapseCount,
+            deathCorruption,
+            companionChoice,
+            currentSeed,
+            drawCount,
+            processed,
+            resolvedTemptations);
+    }
+
+    public void RestoreSaveData(SinRunSaveData data)
+    {
+        if (data == null)
+            throw new ArgumentNullException(nameof(data));
+
+        data.Validate();
+        InitializeStateModel(data.OriginSin);
+        stateModel.Restore(data.CurrentDominantSin, data.Axes);
+
+        processedEventIds.Clear();
+        for (int index = 0; index < data.ProcessedEventIds.Length; index++)
+        {
+            SinEventId eventId = data.ProcessedEventIds[index];
+            if (eventId.IsValid)
+                processedEventIds.Add(eventId);
+        }
+
+        resolvedTemptationIds.Clear();
+        for (int index = 0; index < data.ResolvedTemptationIds.Length; index++)
+        {
+            string encounterId = data.ResolvedTemptationIds[index];
+            if (!string.IsNullOrWhiteSpace(encounterId))
+                resolvedTemptationIds.Add(encounterId);
+        }
+
+        CollapseCount = data.CollapseCount;
+        deathCorruption = data.DeathCorruption;
+        companionChoice = data.CompanionChoice;
+        dominantSin = LegacySinCompatibilityAdapter.ToDominantSin(data.CurrentDominantSin);
+        PlayerActionEvents.ConfigureRun(data.RunId, data.NextEventSequence);
+
+        if (SeedManager.Instance != null)
+            SeedManager.Instance.Restore(data.Seed, data.RandomDrawCount);
+
+        float originPressure = stateModel.GetPressure(stateModel.OriginSin);
+        momentum = originPressure * Mathf.Max(0f, maxMomentum);
+        stability = (1f - originPressure) * Mathf.Max(0f, maxStability);
+        Sin = Mathf.Max(1, Mathf.RoundToInt(momentum));
+        RecalculateState();
+        PublishSnapshot();
+    }
+
+    public void SetDeathCorruption(float value)
+    {
+        deathCorruption = Mathf.Clamp01(value);
+    }
+
+    public void SetCompanionChoice(DeathCompanionChoice choice)
+    {
+        companionChoice = choice;
+    }
+
+    private void InitializeStateModel(SinType originSin)
+    {
+        stateModel = new SinStateModel(originSin);
+        evaluators.Clear();
+        evaluators.Add(new WrathActionEvaluator());
+        evaluators.Add(new GreedActionEvaluator());
+        SynchronizeCompatibilityPressure();
+        PublishSnapshot();
+    }
+
+    private void EnsureStateModel()
+    {
+        if (stateModel == null)
+            InitializeStateModel(LegacySinCompatibilityAdapter.ToSinType(dominantSin));
+    }
+
+    private void SynchronizeCompatibilityPressure()
+    {
+        if (stateModel == null)
+            return;
+
+        SinType legacySin = LegacySinCompatibilityAdapter.ToSinType(dominantSin);
+        float compatibilityPressure = LegacySinCompatibilityAdapter.CalculatePressure(
+            momentum,
+            maxMomentum,
+            stability,
+            maxStability);
+
+        if (stateModel.GetPressure(legacySin) + 0.0001f < compatibilityPressure)
+        {
+            stateModel.SetPressure(legacySin, compatibilityPressure);
+            PublishSnapshot();
+        }
+    }
+
+    private void PublishSnapshot()
+    {
+        if (stateModel == null)
+            return;
+
+        CurrentSnapshot = stateModel.CreateSnapshot();
+        OnSnapshotChanged?.Invoke(CurrentSnapshot);
+    }
+
+    private static bool IsGreedChoice(SinActionKind kind)
+    {
+        return kind == SinActionKind.RewardCollected
+            || kind == SinActionKind.RewardRejected
+            || kind == SinActionKind.RewardInvested;
+    }
+
+    private static int CompareEventIds(SinEventId left, SinEventId right)
+    {
+        int runComparison = string.Compare(left.RunId, right.RunId, StringComparison.Ordinal);
+        return runComparison != 0 ? runComparison : left.Sequence.CompareTo(right.Sequence);
     }
 }

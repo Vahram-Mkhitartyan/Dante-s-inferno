@@ -1,10 +1,10 @@
 # Project State
 
-Last reviewed: October 18, 2026
+Last reviewed: October 19, 2026
 
 ## Summary
 
-*Dante's Inferno* is currently a playable 2D action prototype built around Spine-based characters, melee combat, reactive enemies, and an early behavior-driven sin system.
+*Dante's Inferno* is currently a playable 2D action prototype built around Spine-based characters, melee combat, reactive enemies, and a seven-axis behavior-driven sin foundation.
 
 The project has a functioning vertical slice, but several systems still contain transitional or duplicated architecture. The next development phase should stabilize the foundations before expanding content.
 
@@ -15,8 +15,7 @@ The project has a functioning vertical slice, but several systems still contain 
 - Character animation: Spine and Fantazia Character Editor
 - Water: Modern Water 2D
 - Main branch: `main`
-- Current milestone: `V.0.2.1`
-- Custom scripts: approximately 52 files and 3,600 lines
+- Current committed milestone: `V.0.2.2`
 
 The Unity Editor currently compiles the project successfully.
 
@@ -26,7 +25,7 @@ The Unity Editor currently compiles the project successfully.
 
 The primary combat and sin-system sandbox. It contains the player, enemies, hostility logic, deterministic seed management, and current world systems.
 
-`Limbo` is currently the only scene enabled in Build Settings.
+Limbo, Acheron, and Training Camp are enabled in Build Settings.
 
 ### Acheron
 
@@ -73,11 +72,11 @@ Enemies can also react to repeated player behavior through counterattacks and ca
 
 ### Sin System
 
-The current implementation tracks one dominant sin, global momentum, global stability, a temporary sin state, collapse count, and a threshold-based Pure Form flag.
+The authoritative model tracks all seven sins simultaneously through independent influence, pressure, and mastery axes. It preserves a fixed Origin Sin, stabilizes changes to Current Dominant Sin, publishes read-only snapshots, and aggregates local pressure into overall pressure.
 
-Player actions are reported through `PlayerActionEvents`. `PlayerBehaviorTracker` detects repeated, alternating, and overcommitted attack patterns. `WorldReactionDirector` translates those signals into pressure consumed by `HostilityDirector`.
+Player actions now produce contextual records with run-scoped event identities. Separate Wrath and Greed evaluators convert those records into state deltas. `WorldReactionDirector` consumes authoritative snapshots while the existing scalar momentum API remains available through a compatibility bridge.
 
-This is a useful prototype of the intended feedback loop, but it does not yet represent all seven sins simultaneously or evaluate long-term mastery.
+Versioned save data preserves all axes, deterministic seed progress, processed events, collapse history, Death corruption, companion choice, and resolved Greed temptations. Wrath is connected to current combat; Greed has a reusable temptation choice component and evaluator contract but still needs authored scene content and presentation.
 
 ## Strong Foundations
 
@@ -85,6 +84,10 @@ This is a useful prototype of the intended feedback loop, but it does not yet re
 - Reusable enemy movement and attack interfaces
 - Central hit resolution
 - Deterministic run seed support
+- Direct-scene runtime bootstrap and isolated persistent services
+- Versioned save schema and rules versioning
+- Contextual action evaluation with duplicate protection
+- Fifteen deterministic Edit Mode tests
 - Data-oriented direction through `SinDefinition`
 - Separate world-reaction layer
 - Respawn flow rather than destroying the player permanently
@@ -95,20 +98,17 @@ This is a useful prototype of the intended feedback loop, but it does not yet re
 - Legacy and replacement knockback components coexist.
 - Gameplay uses hardcoded legacy input even though Unity Input System is installed.
 - Tutorial tracking duplicates gameplay key checks.
-- Global scene searches, singletons, and runtime component creation create initialization-order risks.
-- Persistent managers preserve their root object, potentially carrying scene-specific children between scenes.
+- Some legacy global scene searches and singleton consumers remain.
 - Some components assume required references exist and can fail during `Awake` if prefab wiring changes.
 - Backstabber damage and knockback settings are currently unused; betrayal only changes hostility.
-- No project-specific automated tests or custom assembly definitions exist.
-- A complete build and scene-transition flow has not been established.
+- Scene ordering and narrative transitions are not yet authored as a complete campaign flow.
 
 ## Immediate Priorities
 
-1. Establish a clear bootstrap and persistent-system lifecycle.
-2. Consolidate player animation ownership.
-3. Complete migration to one knockback system.
-4. Introduce an input abstraction based on Unity Input System.
-5. Redesign the sin state model before adding more sin-specific content.
-6. Add focused tests for deterministic gameplay logic.
+1. Author a visible Greed temptation encounter using `GreedTemptation`.
+2. Move Reflection from the scalar API to authoritative snapshots.
+3. Add qualified encounter weighting and mastery evidence limits.
+4. Consolidate player animation ownership.
+5. Complete migration to one knockback system.
+6. Introduce an input abstraction based on Unity Input System.
 7. Define the intended order and transition rules for all scenes.
-

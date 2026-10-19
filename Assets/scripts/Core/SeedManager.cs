@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+[DefaultExecutionOrder(-1000)]
 public class SeedManager : MonoBehaviour
 {
     public static SeedManager Instance { get; private set; }
@@ -10,6 +11,12 @@ public class SeedManager : MonoBehaviour
     public bool randomizeOnPlay = false;
 
     public System.Random Rng { get; private set; }
+    public long DrawCount { get; private set; }
+
+    public static void ResetRuntimeState()
+    {
+        Instance = null;
+    }
 
     void Awake()
     {
@@ -20,20 +27,47 @@ public class SeedManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(transform.root.gameObject);
+        PersistentServiceLifecycle.PersistIndependently(this);
 
         if (randomizeOnPlay)
             seed = Environment.TickCount;
 
         Rng = new System.Random(seed);
+        DrawCount = 0;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     // Deterministic helpers
     public int RangeInt(int minInclusive, int maxExclusive)
-        => Rng.Next(minInclusive, maxExclusive);
+    {
+        DrawCount++;
+        return Rng.Next(minInclusive, maxExclusive);
+    }
 
     public float RangeFloat(float minInclusive, float maxInclusive)
-        => (float)(minInclusive + (maxInclusive - minInclusive) * Rng.NextDouble());
+    {
+        DrawCount++;
+        return (float)(minInclusive + (maxInclusive - minInclusive) * Rng.NextDouble());
+    }
+
+    public void Restore(int restoredSeed, long restoredDrawCount)
+    {
+        seed = restoredSeed;
+        Rng = new System.Random(seed);
+        DrawCount = 0;
+
+        long targetDrawCount = Math.Max(0, restoredDrawCount);
+        while (DrawCount < targetDrawCount)
+        {
+            Rng.Next();
+            DrawCount++;
+        }
+    }
 
     public void Shuffle<T>(System.Collections.Generic.IList<T> list)
     {

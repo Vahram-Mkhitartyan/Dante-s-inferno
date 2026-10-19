@@ -83,6 +83,55 @@ namespace DantesInferno.SinSystem
             SetMastery(sin, GetMastery(sin) + amount);
         }
 
+        public void Apply(SinEvaluationDelta delta)
+        {
+            AddInfluence(delta.Sin, delta.Influence);
+            AddPressure(delta.Sin, delta.Pressure);
+            AddMastery(delta.Sin, delta.Mastery);
+        }
+
+        public SinAxisSaveData[] CreateSaveAxes()
+        {
+            var axes = new SinAxisSaveData[SinCount];
+            for (int index = 0; index < SinCount; index++)
+            {
+                SinType sin = (SinType)index;
+                axes[index] = new SinAxisSaveData(
+                    sin,
+                    influenceWeights[index],
+                    pressures[index],
+                    mastery[index]);
+            }
+
+            return axes;
+        }
+
+        public void Restore(SinType currentDominantSin, SinAxisSaveData[] axes)
+        {
+            ValidateSin(currentDominantSin);
+            if (axes == null || axes.Length != SinCount)
+                throw new ArgumentException("All seven sin axes are required.", nameof(axes));
+
+            var seen = new bool[SinCount];
+            for (int index = 0; index < axes.Length; index++)
+            {
+                SinAxisSaveData axis = axes[index]
+                    ?? throw new ArgumentException("Sin axis data cannot be null.", nameof(axes));
+                int sinIndex = GetIndex(axis.Sin);
+                if (seen[sinIndex])
+                    throw new ArgumentException($"Duplicate save axis for {axis.Sin}.", nameof(axes));
+
+                seen[sinIndex] = true;
+                influenceWeights[sinIndex] = Math.Max(rules.MinimumInfluenceWeight, axis.InfluenceWeight);
+                pressures[sinIndex] = Clamp01(axis.Pressure);
+                mastery[sinIndex] = Clamp01(axis.Mastery);
+            }
+
+            CurrentDominantSin = currentDominantSin;
+            dominanceCandidate = currentDominantSin;
+            dominanceCandidateSeconds = 0f;
+        }
+
         public void AdvanceDominance(float deltaSeconds)
         {
             if (deltaSeconds < 0f)

@@ -1,6 +1,24 @@
 # Sin System Integration Plan
 
-Status: Architecture proposal; no implementation approved
+Status: Foundation integrated; Wrath connected; Greed contract validated
+
+## Implementation Progress
+
+Completed on October 19, 2026:
+
+- Seven-axis authoritative state model and immutable snapshots
+- Direct-scene bootstrap and isolated persistent manager lifecycle
+- Compatibility bridge preserving existing scalar gameplay behavior
+- Contextual action records with run-scoped event identities
+- Duplicate-event and repeated-Greed-temptation protection
+- Versioned save data with rules-version validation
+- Deterministic seed and random-draw restoration
+- Data-driven Wrath evaluator connected to combat actions
+- Data-driven Greed evaluator and reusable temptation choice component
+- Snapshot-driven world pressure
+- Fifteen passing deterministic Edit Mode tests
+
+The next content task is to author a visible Greed temptation encounter. The next architecture migration is Reflection consuming snapshots directly.
 
 ## Assessment
 

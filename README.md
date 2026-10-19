@@ -4,12 +4,13 @@ A 2D Unity action game inspired by *Dante's Inferno*, built around fast melee co
 
 ## Current Focus
 
-This update restructures the game around a clearer combat and sin-system foundation:
+The current update integrates the seven-axis sin architecture with the playable combat loop:
 
-- Player actions generate sin momentum.
-- High momentum increases power, but also raises instability.
-- Repeated or careless behavior makes enemies respond more aggressively.
-- Success is about controlled intensity: using power without losing control.
+- Every gameplay action receives a stable run-scoped event identity.
+- Contextual evaluators translate behavior into influence, pressure, and mastery evidence.
+- Wrath reacts to deliberate attacks, repetition, blocking, damage, and unnecessary kills.
+- Greed uses the same contracts for collecting, rejecting, and investing temptation rewards.
+- Existing momentum, power, hostility, and Reflection behavior remains available through a compatibility layer.
 
 ## Core Mechanics
 
@@ -30,16 +31,15 @@ The combat system supports buffered attacks, hit timing, knockback, enemy reacti
 
 ### Sin System
 
-The sin system tracks:
+The authoritative sin model tracks:
 
-- `DominantSin`
-- `Momentum`
-- `Stability`
-- `SinState`
-- `CollapseCount`
-- `Pure Form`
+- fixed Origin Sin and dynamic Current Dominant Sin
+- seven independent influence, pressure, and mastery axes
+- normalized composition and overall instability
+- run, schema, rules, event, and deterministic-seed state
+- collapse history, Death corruption, and companion choice
 
-Player actions push momentum upward. Momentum increases damage potential, but unstable play lowers control. The system is designed to reward high-risk controlled play rather than safe play or runaway spamming.
+The previous scalar API remains active while gameplay systems migrate to immutable snapshots. Versioned JSON save data preserves the authoritative model without serializing scene references.
 
 ### Enemy Reactions
 
@@ -90,6 +90,8 @@ Important folders:
 
 - `Assets/scripts/Combat` - attack execution, health, hit resolving, knockback bridge
 - `Assets/scripts/Core` - sin system, camera, behavior tracking, world reactions
+- `Assets/scripts/SinSystem` - authoritative state, action contracts, evaluators, and save schema
+- `Assets/Tests/EditMode` - deterministic sin-system tests
 - `Assets/scripts/player` - player input, movement, damage reaction, respawn
 - `Assets/scripts/enemy` - enemy state, attacks, movement, counterattacks
 - `Assets/Scenes` - current playable scenes
@@ -98,17 +100,15 @@ Important folders:
 
 ## Major Update Notes
 
-This push includes:
+Current foundation work includes:
 
-- A new event layer for player actions.
-- A data-driven `SinDefinition` structure for future sin tuning.
-- A `PlayerBehaviorTracker` for repeated patterns and overcommitment.
-- A `WorldReactionDirector` for connecting sin state to enemy/world pressure.
-- Refactored attack types: `TopDownSwing`, `UpwardLauncher`, `ForwardPierce`.
-- Reworked player and enemy knockback.
-- Player death animation and respawn handling.
-- Improved camera behavior around respawn.
-- More reliable enemy counterattack behavior.
+- automatic direct-scene bootstrap for `SinManager` and `SeedManager`
+- independently persistent services that cannot carry scene-only siblings
+- contextual action records with duplicate-event protection
+- data-driven Wrath and Greed evaluators
+- snapshot-driven world pressure with legacy compatibility
+- versioned save/load support and deterministic RNG restoration
+- an Edit Mode test command at `Tools > Dante's Inferno > Run Sin System Tests`
 
 ## Development Status
 
