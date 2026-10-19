@@ -113,3 +113,10 @@ This push includes:
 ## Development Status
 
 This is an active prototype. The current goal is to make the core combat loop feel good, then deepen the sin system into a full run-defining mechanic with unique behavior per dominant sin.
+
+## Documentation
+
+- [Current project state](Docs/PROJECT_STATE.md)
+- [Sin system specification](Docs/SIN_SYSTEM_SPEC.md)
+- [Sin system integration plan](Docs/SIN_SYSTEM_INTEGRATION.md)
+- [Sin system decisions](Docs/SIN_SYSTEM_DECISIONS.md)

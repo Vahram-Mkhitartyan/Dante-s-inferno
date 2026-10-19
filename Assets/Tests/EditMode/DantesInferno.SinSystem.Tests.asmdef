@@ -1,0 +1,23 @@
+{
+  "name": "DantesInferno.SinSystem.Tests",
+  "rootNamespace": "DantesInferno.SinSystem.Tests",
+  "references": [
+    "DantesInferno.SinSystem"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
