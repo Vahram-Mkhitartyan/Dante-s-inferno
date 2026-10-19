@@ -547,6 +547,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43736bb4413d9425cafdfa8fc8d88e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SinManager
+  dominantSin: 5
+  definition: {fileID: 0}
+  momentum: 0
+  maxMomentum: 100
+  passiveMomentumDecay: 0.75
+  stability: 75
+  maxStability: 100
+  deliberatePauseDelay: 1.1
+  deliberatePauseRecovery: 6
+  maxPowerBonus: 0.75
+  collapseMomentumLoss: 25
+  collapseStabilityRecovery: 35
+  collapseCooldown: 2
+  risingThreshold: 0.35
+  unstableThreshold: 0.7
+  pureFormMomentumThreshold: 0.75
+  pureFormStabilityThreshold: 0.7
+  deathCorruption: 0
+  companionChoice: 0
 --- !u!1 &383743476
 GameObject:
   m_ObjectHideFlags: 0
@@ -895,6 +914,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8808b09ea0394fa6b69498ef66409f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpineAnimationController
+  deathAnimationName: Death
 --- !u!114 &594203390 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2939037815159614840, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
@@ -1265,13 +1285,13 @@ PrefabInstance:
       value: 2.3
       objectReference: {fileID: 0}
     - target: {fileID: 3851111833580975434, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
-      propertyPath: animControl
-      value: 
-      objectReference: {fileID: 594203387}
-    - target: {fileID: 3851111833580975434, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
       propertyPath: upwardLift
       value: 1.35
       objectReference: {fileID: 0}
+    - target: {fileID: 3851111833580975434, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
+      propertyPath: animControl
+      value: 
+      objectReference: {fileID: 594203387}
     - target: {fileID: 3851111833580975434, guid: 9ca88d9e610b24bdda9e430d6697ee7f, type: 3}
       propertyPath: hitDelayMultiplier
       value: 1.5
@@ -1442,6 +1462,60 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1879271127}
   m_SourcePrefab: {fileID: 100100000, guid: 5ce127075183e43ffb7e77ac3a53a3b2, type: 3}
+--- !u!1 &1051310403
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1051310405}
+  - component: {fileID: 1051310404}
+  m_Layer: 0
+  m_Name: Sin Mirror
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1051310404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051310403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97e50491e4b6f48e79dcc0f7edd25365, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MirrorReflection
+  player: {fileID: 0}
+  playerVisual: {fileID: 0}
+  mirrorSize: {x: 3.2, y: 5.4}
+  reflectionOffset: {x: 0, y: 2.5}
+  activationDistance: 8
+  reflectionScale: 1
+  buildPlaceholderSurface: 1
+  glassColor: {r: 0.08, g: 0.11, b: 0.16, a: 0.92}
+  frameColor: {r: 0.24, g: 0.16, b: 0.08, a: 1}
+  frameThickness: 0.18
+--- !u!4 &1051310405
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051310403}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.5, y: 1.6, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1082606293
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2261,6 +2335,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRespawnController
   respawnDelay: 1.5
+  postRespawnInputDelay: 0.25
+  cameraReturnDuration: 2
   respawnPoint: {fileID: 0}
 --- !u!4 &1537008796 stripped
 Transform:
@@ -3229,3 +3305,4 @@ SceneRoots:
   - {fileID: 1588610497}
   - {fileID: 3246750}
   - {fileID: 791323408}
+  - {fileID: 1051310405}

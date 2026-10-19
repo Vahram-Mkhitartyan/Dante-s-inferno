@@ -1,9 +1,11 @@
 using UnityEngine;
+using DantesInferno.SinSystem;
 
 [RequireComponent(typeof(GearEquipper))]
 public class SinReflection : MonoBehaviour
 {
     private GearEquipper gear;
+    private SinManager boundManager;
     private int baseFace;
     private int baseArmor;
     private int baseFeet;
@@ -22,37 +24,79 @@ public class SinReflection : MonoBehaviour
 
     void OnEnable()
     {
-        if (SinManager.Instance != null)
-            SinManager.Instance.OnSinChanged += ApplySin;
-
-        ApplySin(SinManager.Instance != null ? SinManager.Instance.Sin : 0);
+        BindManager();
     }
 
     void OnDisable()
     {
-        if (SinManager.Instance != null)
-            SinManager.Instance.OnSinChanged -= ApplySin;
+        UnbindManager();
     }
 
-    void ApplySin(int sin)
+    void Update()
     {
-        // Reset to base so lower sin can revert gear.
+        if (boundManager != SinManager.Instance)
+            BindManager();
+    }
+
+    private void BindManager()
+    {
+        UnbindManager();
+        boundManager = SinManager.Instance;
+        if (boundManager == null)
+        {
+            ApplyStage(0);
+            return;
+        }
+
+        boundManager.OnSnapshotChanged += ApplySnapshot;
+        ApplySnapshot(boundManager.CurrentSnapshot);
+    }
+
+    private void UnbindManager()
+    {
+        if (boundManager != null)
+            boundManager.OnSnapshotChanged -= ApplySnapshot;
+
+        boundManager = null;
+    }
+
+    private void ApplySnapshot(SinStateSnapshot snapshot)
+    {
+        if (snapshot == null)
+        {
+            ApplyStage(0);
+            return;
+        }
+
+        SinAxisSnapshot dominantAxis = snapshot.GetAxis(snapshot.CurrentDominantSin);
+        float severity = Mathf.Max(snapshot.OverallPressure, dominantAxis.Pressure);
+
+        int stage = severity >= 0.85f ? 4
+            : severity >= 0.6f ? 3
+            : severity >= 0.35f ? 2
+            : severity >= 0.1f ? 1
+            : 0;
+        ApplyStage(stage);
+    }
+
+    private void ApplyStage(int stage)
+    {
         gear.Face = baseFace;
         gear.Armor = baseArmor;
         gear.Feet = baseFeet;
         gear.Arm = baseArm;
         gear.Shoulder = baseShoulder;
 
-        if (sin >= 1)
-            gear.Face = 16;     // red eyes
+        if (stage >= 1)
+            gear.Face = 16;
 
-        if (sin >= 11)
-            gear.Armor = 10;   // red chest
+        if (stage >= 2)
+            gear.Armor = 10;
 
-        if (sin >= 16)
-            gear.Feet = 10;    // red legs
+        if (stage >= 3)
+            gear.Feet = 10;
 
-        if (sin >= 25)
+        if (stage >= 4)
         {
             gear.Face = 10;
             gear.Armor = 10;

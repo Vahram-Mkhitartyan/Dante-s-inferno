@@ -3,6 +3,10 @@ using System.Collections;
 
 public class RowingBoatMovement : MonoBehaviour
 {
+    [Header("Passenger")]
+    [SerializeField] private Rigidbody2D passengerBody;
+    [SerializeField] private bool findPlayerAutomatically = true;
+
     [Header("Rowing")]
     public float rowInterval = 3f;        // seconds between strokes
     public float strokeDuration = 0.3f;   // how long the push lasts
@@ -22,6 +26,7 @@ public class RowingBoatMovement : MonoBehaviour
     void Start()
     {
         moveDirection.Normalize();
+        ResolvePassenger();
         StartCoroutine(RowRoutine());
     }
 
@@ -36,8 +41,28 @@ public class RowingBoatMovement : MonoBehaviour
         velocity -= quadraticDrag * velocity * Mathf.Abs(velocity) * dt;
         velocity -= linearDrag * velocity * dt;
 
-        // Move boat
-        transform.position += (Vector3)(moveDirection * (riverSpeed + velocity) * dt);
+        Vector2 displacement = moveDirection * (riverSpeed + velocity) * dt;
+
+        transform.position += (Vector3)displacement;
+        MovePassenger(displacement);
+    }
+
+    void ResolvePassenger()
+    {
+        if (passengerBody != null || !findPlayerAutomatically)
+            return;
+
+        PlayerController player = FindFirstObjectByType<PlayerController>();
+        if (player != null)
+            passengerBody = player.GetComponent<Rigidbody2D>();
+    }
+
+    void MovePassenger(Vector2 displacement)
+    {
+        if (passengerBody == null)
+            return;
+
+        passengerBody.position += displacement;
     }
 
     IEnumerator RowRoutine()
